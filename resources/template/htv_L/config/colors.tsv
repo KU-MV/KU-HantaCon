@@ -1,0 +1,34 @@
+host	Homo sapiens	#fb8072
+host	Apodemus agrarius	#80b1d3
+host	Apodemus chejuensis	#b3de69
+		
+		
+		
+		
+country	South Korea	#3690c0
+country	China	#a1d99b
+country	Russia	#feb24c
+		
+		
+province	Gyeonggi	#fb8072
+province	Gangwon	#3690c0
+province	Jeju	#a1d99b
+		
+		
+		
+		
+genetic exchange	Reassortant	#fb8072
+genetic exchange	Recombinant	#f6b26b
+		
+		
+lineage	lineage 1	#f7564b
+lineage	lineage 2	#90e869
+lineage	lineage 3	#5596d2
+lineage	hybrid zone	#f6b26b
+lineage	lineage 5	#9379d7
+		
+hybrid zone	lineage 1	#f7564b
+hybrid zone	lineage 2	#90e869
+hybrid zone	lineage 3	#5596d2
+hybrid zone	hybrid zone	#f6b26b
+hybrid zone	lineage 5	#9379d7

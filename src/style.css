@@ -1,0 +1,510 @@
+/* =========================================================
+   Reset
+========================================================= */
+
+body {
+    margin: 0;
+    font-family: sans-serif;
+    background: #ffffff;
+}
+
+
+/* =========================================================
+   Layout
+========================================================= */
+
+.app {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* =========================================================
+   Top Bar
+========================================================= */
+
+.topbar {
+    display: flex;
+    align-items: center;
+    background: #8C1D40;
+    color: white;
+    padding: 10px 20px;
+}
+
+.logo {
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 40px;
+}
+
+.tabs button {
+    background: transparent;
+    border: none;
+    color: white;
+    margin-right: 15px;
+    padding: 8px 14px;
+    cursor: pointer;
+}
+
+.tabs button:hover {
+    background: #6E1632;
+    border-radius: 5px;
+}
+
+
+/* =========================================================
+   Content
+========================================================= */
+
+#content {
+    flex: 1;
+    overflow: auto;
+    padding: 20px;
+    padding-bottom: 100px; 
+}
+
+.page {
+    display: none;
+}
+
+
+/* =========================================================
+   Form Elements
+========================================================= */
+
+fieldset {
+    margin-bottom: 20px;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: white;
+}
+
+label {
+    display: block;
+    margin: 6px 0;
+}
+
+/* text input */
+
+input[type="text"] {
+    width: 320px;
+    padding: 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+}
+
+/* number input */
+
+input[type="number"] {
+    width: 50px;
+    padding: 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+}
+
+/* select */
+
+select {
+    width: 180px;
+    padding: 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+}
+
+/* =========================================================
+   Buttons
+========================================================= */
+
+button {
+
+    background: #8C1D40;
+    color: white;
+
+    border: none;
+    border-radius: 4px;
+
+    padding: 6px 14px;
+
+    cursor: pointer;
+}
+
+button:hover {
+    background: #6E1632;
+    border-radius: 5px;
+}
+
+
+/* =========================================================
+   iframe
+========================================================= */
+
+iframe {
+    width: 100%;
+    height: calc(100vh - 200px);
+    border: none;
+}
+
+
+/* =========================================================
+   Log Output
+========================================================= */
+
+pre {
+    background: #222;
+    padding: 10px;
+    height: 300px;
+    overflow: auto;
+    font-family: monospace;
+    white-space: pre-wrap;
+}
+
+pre .msg {
+    color: #000000;
+}
+
+pre .cmd {
+    color: #8C1D40;
+}
+
+pre .error {
+    color: rgb(255, 255, 255);
+    background-color: #F44336;
+}
+
+
+/* =========================================================
+   Workflow Bar
+========================================================= */
+
+.workflow-bar {
+    background: #8C1D40;
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    gap: 6px;
+    padding: 8px 15px;
+}
+
+.workflow-info {
+    width: 100%;
+    font-size: 13px;
+    font-weight: 500;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   Progress Bar
+========================================================= */
+
+.progress-container {
+    width: 100%;
+    height: 10px;
+
+    background: #ffffff;
+
+    border-radius: 6px;
+    overflow: hidden;
+
+    border: 2px solid #ffffff;
+}
+
+.progress-bar {
+
+    height: 100%;
+    width: 0%;
+
+    background: linear-gradient(
+        90deg,
+        #8C1D40,
+        #b91c1c
+    );
+
+    transition: width 0.25s ease;
+}
+
+
+/* =========================================================
+   Offline Nextstrain
+
+
+#offlineBox {
+    display: none;
+}
+========================================================= */
+
+/* =========================================================
+   Log Button
+========================================================= */
+
+#logBtn {
+
+    align-self: flex-end;   /* 오른쪽 정렬 */
+
+    background: #8C1D40;
+    color: white;
+
+    border: none;
+    border-radius: 4px 4px 0 0;
+
+    padding: 4px 12px;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+
+    transition: background 0.2s ease;
+}
+
+#logBtn:hover {
+    background: #6E1632;
+}
+
+
+/* =========================================================
+   Modal
+========================================================= */
+
+.modal-overlay {
+
+    position: fixed;
+    inset: 0;
+
+    background: rgba(120,120,120,0.45);
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9998;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+.modal-content {
+
+    width: 80%;
+    max-width: 1100px;
+    height: 75%;
+
+    background: #8C1D40;
+    color: #e5e7eb;
+
+    border-radius: 12px;
+
+    padding: 16px;
+
+    display: flex;
+    flex-direction: column;
+
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+.modal-content h3 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   Log Window
+========================================================= */
+
+#log {
+
+    flex: 1;
+
+    background: #ffffff;
+
+    padding: 12px;
+
+    overflow: auto;
+
+    font-size: 12px;
+    line-height: 1.45;
+
+    border-radius: 8px;
+}
+
+
+/* =========================================================
+   Home Page
+========================================================= */
+
+/* Banner */
+
+.home-banner img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+/* Intro */
+
+.home-intro {
+
+    display: flex;
+    align-items: center;
+
+    gap: 30px;
+
+    margin-top: 30px;
+}
+
+.intro-icon img {
+    width: 120px;
+}
+
+.intro-text {
+    max-width: 800px;
+}
+
+.intro-text h1 {
+    margin: 0;
+}
+
+.provider {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* Professor */
+
+.home-professor {
+
+    display: flex;
+    align-items: center;
+
+    gap: 25px;
+
+    margin-top: 40px;
+}
+
+
+.home-text {
+    max-width: 800px;
+}
+
+
+
+/* Run 버튼 */
+
+button.run {
+
+    background: #8C1D40;
+
+    color: white;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    padding: 10px 28px;
+
+    border-radius: 6px;
+
+    margin-top: 10px;
+
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+button.run:hover {
+    background: #6E1632;
+    border-radius: 5px;
+}
+
+#workflowLayout {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    background: transparent;
+
+    z-index: 1000;
+}
+
+
+#toast-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 9999;
+}
+
+.toast {
+    min-width: 220px;
+    margin-top: 10px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    color: white;
+    font-size: 14px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+/* 타입별 색상 */
+.toast.success { background: #4CAF50; }
+.toast.error { background: #F44336; }
+.toast.info { background: #2196F3; }
+.toast.warn { background: #FF9800; }
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.btn-disabled{
+  opacity:0.5;
+  cursor:not-allowed;
+}
+
+
+.visualization-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;        /* select랑 버튼 사이 간격 */
+}
+
+.visualization-toolbar label {
+    display: flex;
+    align-items: center;
+    gap: 6px;         /* Mode 글자랑 select 사이 간격 */
+}
+
+
+.logoImg img {
+    width: 100px;
+    height: 100px;
+    display: block;
+}
+
+.title-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.title-layout h1 {
+    margin: 0;
+}

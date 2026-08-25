@@ -1,0 +1,94 @@
+{
+  "name": "hantacon",
+  "version": "1.1.5",
+  "description": "The HanaCon was developed and maintained by a laboratory leaded by Prof. Jin-Won Song at Korea University, Republic of Korea.",
+  "main": "main.js","stackblitz": {},
+  "scripts": {
+    "start": "electron .",
+    "build:linux": "electron-builder --linux",
+    "build:mac": "electron-builder --mac",
+    "build": "electron-builder --linux --mac"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KU-MV/KU-HantaCon.git"
+  },
+  "keywords": [],
+  "author": "Grey Ha <greytrace64@gmail.com>",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/KU-MV/KU-HantaCon/issues"
+  },
+  "homepage": "https://github.com/KU-MV/KU-HantaCon#readme",
+  "devDependencies": {
+    "electron": "latest",
+    "electron-builder": "^26.8.1",
+    "electron-icon-builder": "^2.0.1"
+  },
+  "build": {
+    "productName": "HantaCon",
+    "directories": {
+      "output": "dist"
+    },
+    "linux": {
+      "target": [
+        "deb"
+      ],
+      "category": "Utility",
+      "description": "The HanaCon was developed and maintained by a laboratory leaded by Prof. Jin-Won Song at Korea University, Republic of Korea.",
+      "icon": "./resources/256x256.png"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "category": "public.app-category.utilities",
+      "icon": "./resources/icons/mac/icon.icns",
+      "darkModeSupport": true
+    },
+    "dmg": {
+      "title": "HantaCon ${version}",
+      "background": null,
+      "window": {
+        "width": 540,
+        "height": 380
+      },
+      "contents": [
+        {
+          "x": 150,
+          "y": 180,
+          "type": "file"
+        },
+        {
+          "x": 390,
+          "y": 180,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "files": [
+      "main.js",
+      "package.json",
+      "preload.js",
+      "workerWorkflow.js",
+      "workflow.js",
+      "src/**/*",
+      "resources/**/*"
+    ]
+  }
+}

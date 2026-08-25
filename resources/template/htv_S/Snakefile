@@ -1,0 +1,274 @@
+rule all:
+	input:
+		auspice_json = "auspice/htv_S.json",
+		frequencies_json = "auspice/htv_S_tip-frequencies.json"
+
+
+rule files:
+	params:
+		input_fasta = "data/sequence.fasta",
+		input_alignment = "data/sequence.fasta",
+		dropped_strains = "config/dropped_strains.txt",
+		reference = "config/reference.gb",
+		metadata = "data/metadata.tsv",
+
+		colors = "config/colors.tsv",
+		lat_longs = "config/lat_longs.tsv",
+		auspice_config = "auspice_config.json",
+		description = "config/description.md"
+
+_params = rules.files.params
+
+
+rule index:
+	message:
+		"""
+		create index file for sequence
+		"""
+	input:
+		sequences = _params.input_fasta
+	output:
+		indexed = "results/sequence_index.tsv"
+	shell:
+		"""
+		augur index \
+			--sequences {input.sequences} \
+			--output {output.indexed}
+		"""
+
+
+
+
+
+
+rule filter:
+	message:
+		"""
+		filtering sequences
+		"""
+	input:
+		sequences = _params.input_fasta,
+		indexed = rules.index.output.indexed,
+		metadata = "data/metadata.tsv",
+		exclude = _params.dropped_strains
+	output:
+		filtered = "results/filtered.fasta"
+	params:
+		group_by = "country",
+		sequences_per_group = 1000,
+		min_date = 2000
+	shell:
+		"""
+		augur filter\
+	                --sequences-per-group {params.sequences_per_group}\
+			--sequences {input.sequences}\
+			--sequence-index {input.indexed}\
+			--metadata {input.metadata}\
+			--exclude {input.exclude}\
+			--output {output.filtered}\
+			--group-by {params.group_by}\
+		"""
+
+
+
+
+
+rule align:
+	message:
+		"""
+		aligning sequences
+		"""
+	input:
+		sequences = rules.filter.output,
+		reference = _params.reference
+	output:
+		alignment = "results/aligned.fasta"
+	shell:
+		"""
+		augur align\
+		--sequences {input.sequences}\
+		--reference-sequence {input.reference}\
+		--output {output.alignment}\
+		--fill-gaps
+		"""
+
+
+
+
+
+rule tree:
+	message:
+		"""
+		create raw tree
+		"""
+	input:
+		alignment = _params.input_alignment
+	output:
+		tree = "results/tree-raw.nwk"
+	shell:
+		"""
+		augur tree\
+		--alignment {input.alignment}\
+		--output {output.tree}
+		"""
+
+
+
+
+rule refine:
+	message:
+		"""
+		refine tree. It takes long time.
+		"""
+	input:
+		tree = rules.tree.output.tree,
+		alignment = _params.input_fasta,
+		metadata = _params.metadata
+	output:
+		tree = "results/tree.nwk",
+		node_data = "results/branch_lengths.json"
+	params:
+		coalescent = "opt",
+		date_inference = "marginal",
+	shell:
+		"""
+		augur refine\
+		--tree {input.tree}\
+		--alignment {input.alignment}\
+		--metadata {input.metadata}\
+		--output-tree {output.tree}\
+		--output-node-data {output.node_data}\
+		--timetree\
+		--coalescent {params.coalescent}\
+		--date-confidence\
+		--date-inference {params.date_inference}\
+		"""
+
+
+
+
+
+rule traits:
+	message:
+		"""
+		create traits.
+		"""
+	input:
+		tree = rules.refine.output.tree,
+		metadata = _params.metadata
+	output:
+		node_data = "results/traits.json"
+	params:
+		columns = "province"
+	shell:
+		"""
+		augur traits\
+		--tree {input.tree}\
+		--metadata {input.metadata}\
+		--output-node-data {output.node_data}\
+		--columns {params.columns}\
+		--confidence
+		"""
+
+
+
+
+rule ancestral:
+	message:
+		"""
+		reconstructing ancestral sequences and mutations
+		"""
+	input:
+		tree = rules.refine.output.tree,
+		alignment = _params.input_fasta
+	output:
+		node_data = "results/nt_muts.json"
+	params:
+		inference = "joint"
+	shell:
+		"""
+		augur ancestral\
+		--tree {input.tree}\
+		--alignment {input.alignment}\
+		--output-node-data {output.node_data}\
+		--inference {params.inference}
+		"""
+
+
+
+
+
+		
+rule translate:
+	message:
+		"""
+		translate to protein
+		"""
+	input:
+		tree = rules.refine.output.tree,
+		node_data = rules.ancestral.output.node_data,
+		reference = _params.reference
+	output:
+		node_data = "results/aa_muts.json"
+	shell:
+		"""
+		augur translate\
+		--tree {input.tree}\
+		--ancestral-sequences {input.node_data}\
+		--reference-sequence {input.reference}\
+		--output-node-data {output.node_data}
+		"""
+
+
+	
+
+rule export:
+	message:
+		"""
+		export final json
+		"""
+	input:
+		tree = rules.refine.output.tree,
+		metadata = _params.metadata,
+		branch_lengths = rules.refine.output.node_data,
+		traits = rules.traits.output.node_data,
+		nt_muts = rules.ancestral.output.node_data,
+		aa_muts = rules.translate.output.node_data,
+		colors = _params.colors,
+		lat_longs = _params.lat_longs,
+		auspice_config = _params.auspice_config,
+		description = _params.description
+	output:
+		auspice_json = rules.all.input.auspice_json
+	shell:
+		"""
+		augur export v2\
+		--tree {input.tree}\
+		--metadata {input.metadata}\
+		--node-data {input.branch_lengths} {input.traits} {input.nt_muts} {input.aa_muts}\
+		--auspice-config {input.auspice_config}\
+		--description {input.description}\
+		--colors {input.colors}\
+		--lat-longs {input.lat_longs}\
+                --include-root-sequence \
+		--output {output.auspice_json}
+		"""
+
+rule frequencies:
+	message:
+		"""
+		generate frequencies json
+		"""
+	input:
+		tree = rules.refine.output.tree,
+		metadata = _params.metadata
+	output:
+		tip_frequencies_json = rules.all.input.frequencies_json
+	shell:
+		"""
+		augur frequencies\
+		--tree {input.tree}\
+		--metadata {input.metadata}\
+		--method kde\
+		--output {output.tip_frequencies_json}
+		"""

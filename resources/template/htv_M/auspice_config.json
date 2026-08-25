@@ -1,0 +1,84 @@
+{
+  "title": "High-resolution phylogeny of Hantaan orthohantavirus M segment in South Korea",
+  "maintainers": [
+    {"name": "Jin-Won Song (Korea University)", "url": "http://github.com/reyus2"}
+  ],
+  "build_url": "https://nextstrain.org/community/KU-MV/HTNV/M",
+  "colorings": [
+    {
+      "key": "gt",
+      "title": "Genotype",
+      "type": "categorical"
+    },
+    {
+      "key": "lineage",
+      "title": "Lineage",
+      "type": "categorical"
+    },
+    {
+      "key": "hybrid zone",
+      "title": "Hybrid zone",
+      "type": "categorical"
+    },
+    {
+      "key": "genetic exchange",
+      "title": "Genetic exchange",
+      "type": "categorical"
+    },
+    {
+      "key": "num_date",
+      "title": "Date",
+      "type": "continuous"
+    },
+    {
+      "key": "host",
+      "title": "Host",
+      "type": "categorical"
+    },
+    {
+      "key": "country",
+      "title": "Country",
+      "type": "categorical"
+    },
+    {
+      "key": "province",
+      "title": "Province",
+      "type": "categorical"
+    },
+    {
+      "key": "city",
+      "title": "City",
+      "type": "categorical"
+    },
+    {
+      "key": "town",
+      "title": "Town",
+      "type": "categorical"
+    }
+  ],
+  "geo_resolutions": [
+    "country",
+    "province",
+    "city",
+    "town"
+  ],
+  "panels": [
+     "tree",
+     "map",
+     "entropy",
+     "frequencies"
+  ],
+  "display_defaults": {
+    "map_triplicate": true
+  },
+  "filters": [
+    "province",
+    "country",
+    "city",
+    "town",
+    "genetic exchange",
+    "lineage",
+    "hybrid zone",
+    "host"
+  ]
+}

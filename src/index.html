@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>HantaCon</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================= Top Bar ================= -->
+    <div class="topbar">
+
+        <div class="logo">
+            HantaCon
+        </div>
+
+        <div class="tabs">
+            <button data-page="home">Home</button>
+            <button data-page="sequence">Sequence</button>
+            <button data-page="phylodynamics">Phylodynamics</button>
+            <button data-page="visualization">Visualization</button>
+            <button data-page="settings">Settings</button>
+        </div>
+    </div>
+
+    <!-- ================= Content ================= -->
+    <div id="content">
+
+        <!-- ================= Home ================= -->
+        <div id="homePage" class="page" style="display: block;">
+
+            <!-- banner -->
+            <div class="home-banner">
+                <img src="img/banner.jpg">
+            </div>
+
+
+            <div class="home-professor">
+                <div class="intro-icon">
+                    <img src="img/professor.jpg">
+                </div>
+
+                <div class="home-text">
+                    <h3>PI Introduction</h3>
+                    <p>
+                        Professor Jin-Won Song is a Professor of Microbiology at Korea University College of Medicine whose research focuses on virology, genomic epidemiology, and emerging zoonotic pathogens. His work includes infectious disease research using diagnostic and next-generation sequencing-based approaches. HantaCon was developed from this research framework.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="home-intro">
+
+                <div class="intro-icon">
+                    <img src="img/pictogram.png">
+                </div>
+
+                <div class="home-text">
+                    <h3>HantaCon About the Program</h3>
+
+                    <p>
+                        HantaCon is maintained by the laboratory of Professor Jin-Won Song at Korea University College of Medicine. Reference viral genomic sequences used in this program were obtained from the GenBank database. For questions regarding program operation and maintenance, please contact the Project Manager (Kyungmin Park, PhD; kmpark0131@korea.ac.kr). For scientific inquiries or requests related to the use of original genomic sequences or project-derived results in publications, please contact the Principal Investigator (Jin-Won Song; jwsong@korea.ac.kr).
+                    </p>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ================= sequence ================= -->
+        <div id="sequencePage" class="page" style="display: none;">
+            <div class="title-layout">
+                <h1>Consensus sequence</h1>
+                <div class="logoImg">
+                    <img src="img/lab.png">
+                </div>
+            </div>
+
+            <fieldset>
+                <legend>Input data</legend>
+                <label>
+                    Prefix
+                    <input type="text" id="prefix" value="HTNV_TEST001">
+                </label>
+                <button id="selectFastq">Select FASTQ</button>
+                <input type="text" id="fastqPath" readonly>
+                <label>
+                    Reference
+                    <select id="reference">
+                        <option value="HTNV_76-118">HTNV_76-118</option>
+                        <option value="HTNV_Ac20-5">HTNV_Ac20-5</option>
+                    </select>
+                </label>
+                <label>
+                    Variant Quality Threshold
+                    <input type="number" id="variant_quality_threshold" value="10" min="0">
+                </label>
+                <label>
+                    Variant Depth Threshold
+                    <input type="number" id="variant_depth_threshold" value="50" min="0">
+                </label>
+                <label>
+                    Low Coverage Threshold
+                    <input type="number" id="low_cov_threshold" value="5" min="0">
+                </label>
+            </fieldset>
+
+            <button class="run" id="runSequence">Generate</button>
+            <button class="run openResult">Open result</button>
+        </div>
+
+        <!-- ================= phylodynamics ================= -->
+        <div id="phylodynamicsPage" class="page" style="display: none;">
+            <div class="title-layout">
+                <h1>Phylodynamic analysis</h1>
+                <div class="logoImg">
+                    <img src="img/lab.png">
+                </div>
+            </div>
+
+            <fieldset>
+            <legend>Input data</legend>
+            <label>
+                <button id="selectFasta">Select FASTA</button>
+                <input type="text" id="fastaFile" readonly>
+            </label>
+            <label>
+                Segment
+                <select id="fastaType">
+                    <option value="L">L</option>
+                    <option value="M">M</option>
+                    <option value="S">S</option>
+                </select>
+            </label>
+            </fieldset>
+            <fieldset>
+                <legend>Sample Information</legend>
+                <label>Host <input type="text" id="host" value=""></label>
+                <label style="display: none;">Genetic Exchange <input type="text" id="genetic_exchange" value=""></label>
+                <label style="display: none;">Lineage <input type="text" id="lineage" value=""></label>
+                <label style="display: none;">Hybrid Zone <input type="text" id="hybrid_zone" value=""></label>
+            </fieldset>
+
+            <fieldset>
+                <legend>Location</legend>
+                <label>Country <input type="text" id="country" value=""></label>
+                <label>Province <input type="text" id="province" value=""></label>
+                <label>City <input type="text" id="city" value=""></label>
+                <label>Town <input type="text" id="town" value=""></label>
+            </fieldset>
+
+            <fieldset>
+                <legend>Collection Date</legend>
+                <label>
+                    Year
+                    <select id="yearSelect"></select>
+                </label>
+
+                <label>
+                    Month
+                    <select id="monthSelect">
+                    <option value="XX">Unknown</option>
+                    <option value="01">01</option>
+                    <option value="02">02</option>
+                    <option value="03">03</option>
+                    <option value="04">04</option>
+                    <option value="05">05</option>
+                    <option value="06">06</option>
+                    <option value="07">07</option>
+                    <option value="08">08</option>
+                    <option value="09">09</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    </select>
+                </label>
+
+                <label>
+                    Day
+                    <select id="daySelect" disabled>
+                    <option value="XX">Unknown</option>
+                    </select>
+                </label>
+            </fieldset>
+
+            <fieldset style="display: none;">
+                <legend>Collection Information</legend>
+                <label>Accession <input type="text" id="accession" value=""></label>
+                <label>Database <input type="text" id="db" value=""></label>
+            </fieldset>
+
+            <fieldset style="display: none;">
+                <legend>Publication</legend>
+                <label>Title <input type="text" id="title" value=""></label>
+                <label>Journal <input type="text" id="journal" value=""></label>
+                <label>Paper URL <input type="text" id="paper_url" value=""></label>
+            </fieldset>
+            <button class="run" id="generatephylodynamics">Generate metadata</button>
+            <button class="run openResult">Open result</button>
+        </div>
+
+        <!-- ================= visualization ================= -->
+        <div id="visualizationPage" class="page" style="display: none;">
+            <div class="title-layout">
+                <h1>Auspice visualization</h1>
+                <div class="logoImg">
+                    <img src="img/lab.png">
+                </div>
+            </div>
+
+
+            <div class="visualization-toolbar">
+                <label>
+                    Mode
+                    <select id="visualizationMode">
+                        <option value="online">Online</option>
+                        <option value="offline">Offline</option>
+                    </select>
+                </label>
+
+                <button id="refreshIframe">Refresh</button>
+                <button class="openResult">Open result</button>
+            </div>
+
+            <hr>
+
+            <iframe id="auspiceFrame"
+                src="https://auspice.us"
+                sandbox="allow-scripts allow-popups allow-storage-access-by-user-activation allow-same-origin allow-downloads">
+            </iframe>
+        </div>
+
+
+        <!-- Settings 페이지 -->
+        <div id="settingsPage" class="page" style="display: none;">
+            <h1>Docker Compose Control</h1>
+            <div class="docker-buttons">
+                <button id="restartServices">Restart Services</button>
+                <button id="reinstallServices">Reinstall Services</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================= Workflow Bar ================= -->
+    <div id="workflowLayout">
+
+        <!-- 로그 버튼 -->
+        <button id="logBtn" class="log-button">Log</button>
+
+        <!-- workflow bar -->
+        <div class="workflow-bar">
+
+            <div class="workflow-info">
+                <span id="workflowStatus">Idle</span>
+            </div>
+
+            <div class="progress-container">
+                <div id="workflowProgress" class="progress-bar"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================= Log Modal ================= -->
+    <div id="logModal" class="modal-overlay">
+
+        <div class="modal-content">
+
+            <h3>Log</h3>
+            <pre id="log"></pre>
+
+        </div>
+
+    </div>
+
+    <div id="toast-container"></div>
+
+</div>
+
+<script src="../src/renderer.js"></script>
+
+</body>
+</html>
