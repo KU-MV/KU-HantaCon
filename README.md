@@ -1,4 +1,4 @@
-<img src="assets/song_lab_logo.png" alt="Song Lab" width="120" align="right">
+<img src="src/img/lab.png" alt="Song Lab" width="120" align="right">
 
 # HantaCon
 
@@ -11,8 +11,7 @@ HantaCon combines automated consensus genome generation from Oxford Nanopore seq
 
 > **v2.1 is the first public release.** Earlier versions were internal prototypes and are not distributed.
 
-<!-- TODO: add assets/hantacon_auspice.png (Visualization tab screenshot) -->
-<img src="assets/hantacon_auspice.png" alt="HantaCon Auspice visualization" width="820">
+<img src="src/img/screenshots/1.png" alt="HantaCon Auspice visualization" width="820">
 
 ## Overview
 
@@ -40,8 +39,6 @@ HantaCon is currently supported on:
 Docker is required to run the containerized bioinformatics environment. All bioinformatics dependencies are pre-installed in the container and do not require separate installation.
 
 Runtime reference: for the datasets described in the associated study, analysis of the L, M, and S segments, from prepared FASTQ reads through consensus generation to localized Nextstrain visualization, completed within approximately 15 minutes on a MacBook Pro (Apple M3 Pro, 36 GB RAM), excluding sequencing and manual gap-filling time.
-
-<!-- TODO: state minimum RAM and free disk space, and whether an internet connection is required for the Visualization tab -->
 
 ## Installation
 
@@ -140,8 +137,7 @@ The interface is organized into five tabs: **Home**, **Sequence**, **Phylodynami
 
 ### 1. Sequence: consensus generation
 
-<!-- TODO: add assets/hantacon_sequence.png -->
-<img src="assets/hantacon_sequence.png" alt="Consensus sequence tab" width="640">
+<img src="src/img/screenshots/2.png" alt="Consensus sequence tab" width="640">
 
 Enter a sample prefix, select a FASTQ file, and choose the reference genome (HTNV_76-118). The consensus thresholds can be adjusted:
 
@@ -157,8 +153,7 @@ Genome coverage is calculated relative to the HTNV 76-118 reference, excluding t
 
 ### 2. Phylodynamics: metadata and phylogenetic analysis
 
-<!-- TODO: add assets/hantacon_phylodynamics.png -->
-<img src="assets/hantacon_phylodynamics.png" alt="Phylodynamic analysis tab" width="640">
+<img src="src/img/screenshots/3.png" alt="Phylodynamic analysis tab" width="640">
 
 Select a consensus FASTA file and the corresponding genomic segment (L, M, or S). Enter the sample information used for phylogeographic placement:
 
@@ -169,8 +164,6 @@ Select a consensus FASTA file and the corresponding genomic segment (L, M, or S)
 Press **Generate metadata** to build the dataset and run the segment-specific analysis against the bundled reference database. Each segment is analyzed separately.
 
 ### 3. Visualization: interactive exploration
-
-<!-- TODO: add assets/hantacon_auspice.png (same image as above, or a cropped variant) -->
 
 Open the Auspice viewer to explore the resulting phylogeny. Tips can be coloured by metadata field, filtered by query, and restricted to a date range. The Geography panel maps sequences by their annotated locality, and the entropy panel shows nucleotide diversity across the genome.
 
@@ -245,7 +238,7 @@ License information will be added soon.
 
 ## Developed by
 
-<img src="assets/song_lab_logo.png" alt="Song Lab" width="150" align="left" hspace="20">
+<img src="src/img/lab.png" alt="Song Lab" width="150" align="left" hspace="20">
 
 **Song Lab, Hantavirus Genomics and Epidemiology**  
 Department of Microbiology and Institute for Viral Diseases  
