@@ -164,7 +164,7 @@ Select a consensus FASTA file and the corresponding genomic segment (L, M, or S)
 Press **Generate metadata** to build the dataset and run the segment-specific analysis against the bundled reference database. Each segment is analyzed separately.
 
 ### 3. Visualization: interactive exploration
-
+<img src="src/img/screenshots/4.png" alt="Visualization analysis tab" width="640">
 Open the Auspice viewer to explore the resulting phylogeny. Tips can be coloured by metadata field, filtered by query, and restricted to a date range. The Geography panel maps sequences by their annotated locality, and the entropy panel shows nucleotide diversity across the genome.
 
 ## Reference database
