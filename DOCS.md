@@ -70,7 +70,7 @@ Installed in the `hantacon_core` image from `resources/docker/env.yml`:
 | bcftools | 1.24 | variant filtering and consensus application |
 | htslib | 1.23.1 | `bgzip` and `tabix` |
 | bedtools | 2.31.1 | coverage calculation and low-coverage masking |
-| seqkit | 2.14.0 | FASTA handling |
+| seqkit | 2.14.0 | installed; not used by the current workflow |
 | mafft | 7.526 | multiple sequence alignment |
 | vcfpy | 0.13.6 | used by `filter_indel_with_sr.py` |
 | k8 | 1.2 | JavaScript runtime required by `mini_align` |
@@ -115,8 +115,6 @@ Then MAFFT aligns `data/sequence.fasta` in the `hantacon_core` container, and `s
 
 The resulting `auspice/htv_<segment>.json` and its two sidecar files, `htv_<segment>_tip-frequencies.json` and `htv_<segment>_root-sequence.json`, are copied to the run result directory and to `workspace/auspice/`, where the Auspice server picks them up. Without the tip-frequencies file Auspice shows `Failed to fetch tip frequencies`.
 
-Note on the Snakefile: the `align` rule exists but its output is not consumed, because `tree`, `refine`, and `ancestral` read `data/sequence.fasta` directly. The alignment used is the one MAFFT writes back over that file in the preceding step.
-
 ## Supported location names
 
 A sequence is placed on the Geography panel only when its `country`, `province`, `city`, and `town` values match an entry in `config/lat_longs.tsv`. The table is identical for all three segments. Matching ignores capitalization but is otherwise exact, including spacing and hyphens. A value with no entry is reported by Augur as `did not have an associated lat/long value` and is not placed at that level; it also appears as a separate category in the colour legend. For example, entering `Korea` instead of `South Korea` splits the country legend into two entries. Leave a level blank rather than typing a placeholder such as `unknown`.
@@ -147,7 +145,7 @@ Each segment template under `resources/template/` carries its own dataset:
 
 The extra metadata row in each case is HTNV 76-118, which is supplied as the annotated reference (`config/reference.gb`) rather than as a dataset sequence.
 
-Sequences and metadata were retrieved from GenBank on 30 August 2025. `config/colors.tsv` assigns colors for host and lineage categories. `config/dropped_strains.txt` is empty, so no strain is excluded at the filter step.
+Sequences and metadata were retrieved from GenBank on 30 August 2025. `config/colors.tsv` assigns colors for the country, province, host, lineage, genetic exchange, and hybrid zone categories. `config/dropped_strains.txt` is empty, so no strain is excluded at the filter step.
 
 <!-- TODO: add the inclusion and exclusion criteria used when assembling the dataset. -->
 
@@ -240,7 +238,6 @@ Older versions wrote `UID=1000` and `GID=1000` to `~/Desktop/HantaCon/.env`. Set
 - Li H. Minimap2: pairwise alignment for nucleotide sequences. *Bioinformatics* 34, 3094-3100 (2018).
 - Danecek P, et al. Twelve years of SAMtools and BCFtools. *GigaScience* 10, giab008 (2021).
 - Quinlan AR, Hall IM. BEDTools: a flexible suite of utilities for comparing genomic features. *Bioinformatics* 26, 841-842 (2010).
-- Shen W, et al. SeqKit: a cross-platform and ultrafast toolkit for FASTA/Q file manipulation. *PLoS One* 11, e0163962 (2016).
 - Katoh K, Standley DM. MAFFT multiple sequence alignment software version 7. *Mol Biol Evol* 30, 772-780 (2013).
 - Minh BQ, et al. IQ-TREE 2: new models and efficient methods for phylogenetic inference in the genomic era. *Mol Biol Evol* 37, 1530-1534 (2020).
 - Sagulenko P, Puller V, Neher RA. TreeTime: maximum-likelihood phylodynamic analysis. *Virus Evol* 4, vex042 (2018).
