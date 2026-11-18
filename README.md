@@ -28,7 +28,7 @@ HantaCon integrates an Electron-based graphical user interface with a Docker-con
 ## Requirements
 
 - macOS (Apple silicon or Intel), or Ubuntu Linux 22.04 or later
-- About 15 GB of free disk space
+- Free disk space for Docker Desktop, Node.js, and the HantaCon Docker images (the images use about 6.5 GB)
 - Internet connection for the first installation and the first analysis
 
 Three programs must be installed first: **Docker**, **Node.js** (version 22.12 or later), and **Git**. The steps below install all three. All bioinformatics tools run inside Docker and do not need to be installed separately. The full tool list is in [DOCS.md](DOCS.md).
@@ -37,11 +37,11 @@ Runtime reference (benchmark hardware, not a minimum requirement): for the datas
 
 ## Installation
 
-Commands are typed in the **Terminal** app. Copy each block, paste it into Terminal, and press Enter.
+Commands are typed in the **Terminal** app (macOS: press Cmd+Space, type `Terminal`, press Enter; Ubuntu: press Ctrl+Alt+T). Copy each block, paste it into Terminal, and press Enter.
 
 **macOS**
 
-1. Install Docker Desktop. Download the version for your Mac from [docs.docker.com/desktop/setup/install/mac-install](https://docs.docker.com/desktop/setup/install/mac-install/), open `Docker.dmg`, and drag Docker to Applications. Open Docker from Applications. Signing in is optional (press **Skip**). Wait until the bottom-left corner shows **Engine running**.
+1. Install Docker Desktop. Check your chip under Apple menu > About This Mac (Apple M-series = Apple silicon). Download the matching version from [docs.docker.com/desktop/setup/install/mac-install](https://docs.docker.com/desktop/setup/install/mac-install/), open `Docker.dmg`, and drag Docker to Applications. Open Docker from Applications. Signing in is optional (press **Skip**). Wait until the bottom-left corner shows **Engine running**.
 2. Install Node.js. Download the **LTS macOS Installer (.pkg)** from [nodejs.org/en/download](https://nodejs.org/en/download) and run it. Your Mac password is required.
 3. Check both, in Terminal:
 
@@ -61,6 +61,8 @@ Commands are typed in the **Terminal** app. Copy each block, paste it into Termi
    npm install
    npm start
    ```
+
+   `npm install` may end with a message such as `11 vulnerabilities` and suggest `npm audit fix --force`. Ignore it; do not run `npm audit fix`.
 
 **Ubuntu Linux**
 
@@ -109,7 +111,7 @@ cd ~/KU-HantaCon
 npm start
 ```
 
-Keep the Terminal window open while HantaCon is running.
+Keep the Terminal window open while HantaCon is running. To quit, close the HantaCon window.
 
 **Updating**
 
@@ -117,7 +119,10 @@ Keep the Terminal window open while HantaCon is running.
 cd ~/KU-HantaCon
 git pull
 npm install
+cd ~/Desktop/HantaCon && docker compose down --rmi local && rm dockerfile env.yml docker-compose.yml
 ```
+
+The last line removes the old analysis environment. HantaCon copies the new Docker files at the next start and rebuilds the environment at the next analysis.
 
 **Uninstalling**
 
@@ -142,28 +147,39 @@ The backend containers are built the first time an analysis is started, not at l
 
 ## Quick start
 
-<!-- TODO: add the sample FASTQ (AFMRI_HTNV_20_1.fastq) to a release and link it here -->
+**Example data.** The example uses public Oxford Nanopore reads of sample Aa19-167 (SRA run SRR22029858, BioProject PRJNA893834) from:
+
+> Park K, Lee S-H, Kim J, et al. Multiplex PCR-Based Nanopore Sequencing and Epidemiological Surveillance of *Hantaan orthohantavirus* in *Apodemus agrarius*, Republic of Korea. *Viruses* 13, 847 (2021). https://doi.org/10.3390/v13050847
+
+Download the reads (about 95 MB; this can take several minutes) into the Downloads folder:
+
+```bash
+cd ~/Downloads
+curl -O https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR220/058/SRR22029858/SRR22029858_1.fastq.gz
+gunzip SRR22029858_1.fastq.gz
+```
 
 1. **Sequence tab**: Generate consensus genomes
-   - Prefix: a run name, for example `AFMRI_HTNV_20_1`. Use only letters, numbers, `-` and `_` (no spaces).
-   - **Select FASTQ**: choose your Oxford Nanopore FASTQ file
-   - Reference: `HTNV_76-118`
-   - Press **Generate**. When the status bar shows **COMPLETE**, the consensus files `<prefix>_L.fasta`, `<prefix>_M.fasta`, and `<prefix>_S.fasta` are in `~/Desktop/HantaCon/workspace/result/<date_time>/`.
+   - Prefix: `Example_Aa19-167`. A prefix may contain only letters, numbers, `-` and `_`.
+   - **Select FASTQ**: `Downloads/SRR22029858_1.fastq`
+   - Reference: `HTNV_76-118`. Leave the three thresholds at their defaults.
+   - Press **Generate**. When the status bar shows **COMPLETE**, `Example_Aa19-167_L.fasta`, `Example_Aa19-167_M.fasta`, and `Example_Aa19-167_S.fasta` are in `~/Desktop/HantaCon/workspace/result/<date_time>/`.
 
-2. **Phylodynamics tab**: Run phylogeographic analysis on the L segment
-   - **Select FASTA**: choose `<prefix>_L.fasta` from the result folder of step 1
+2. **Phylodynamics tab**: Run the analysis on the L segment
+   - **Select FASTA**: `Example_Aa19-167_L.fasta` from the result folder of step 1
    - Segment: `L`
-   - Host: `Homo sapiens`
-   - Location: Country `South Korea`, Province `Gangwon`, City `Cheorwon`, Town `Yuli-ri`
-   - Collection Date: choose the year, month, and day
+   - Host: `Apodemus agrarius`
+   - Location: Country `South Korea`, Province `Gyeonggi`, City `Yeoncheon`, Town `Sang-ri`
+   - Collection Date: `2019`, `11`, `19`
    - Press **Generate metadata**. Wait until the status bar shows **COMPLETE**.
 
-3. **Visualization tab**: Explore the results in Auspice
+3. **Visualization tab**: Open the result in Auspice
    - Set **Mode** to **Offline**.
-   - Click the dataset name under **Available datasets** (for example `20261118/195249/htv/L`). The tree, map, diversity, and frequency panels open.
-   - If a new run does not appear, press **Refresh**.
+   - Click the dataset under **Available datasets**. Its name is the run date and time, for example `20261118/214347/htv/L`. If it is not listed, press **Refresh**.
 
-Location names must match the bundled coordinate table exactly, for example `South Korea`, not `Korea`. Leave a field empty if it is unknown. The list of accepted names is in [DOCS.md](DOCS.md#supported-location-names).
+The reference database already contains this sample as `HTNV_Aa19-167`.
+
+Location names must be spelled as in the bundled coordinate table (capitalization is ignored), for example `South Korea`, not `Korea`. Leave a field empty if it is unknown. The list of accepted names is in [DOCS.md](DOCS.md#supported-location-names).
 
 ## Usage
 
@@ -194,7 +210,7 @@ Enter a sample prefix, select a FASTQ file, and choose the reference genome (HTN
 
 Press **Generate** to run the workflow. Reads are aligned to the tripartite reference, segment-specific alignments are separated, variants are called and filtered, and low-coverage regions are masked. The output is one consensus FASTA file per segment, with the thresholds used for the run recorded in the FASTA header. Press **Open result** to view the output directory.
 
-Variant calling uses the Medaka model `r941_prom_sup_variant_g507` (R9.4.1 flow cells, super-accuracy basecalling). HantaCon does not report a genome coverage value. In the associated study, genome coverage was calculated relative to the HTNV 76-118 reference, excluding the terminal 14 bp conserved sequences at both ends of each segment.
+Variant calling uses the Medaka model `r941_prom_sup_variant_g507` (R9.4.1 flow cells, super-accuracy basecalling).
 
 ### 3. Phylodynamics: metadata and phylogenetic analysis
 
@@ -224,9 +240,9 @@ HantaCon includes a curated reference database of *Orthohantavirus hantanense* s
 |---|---|
 | Source | Publicly available HTNV and Soochong virus sequences retrieved from GenBank (accessed 30 August 2025) |
 | Size | 162 L-segment, 163 M-segment, and 164 S-segment sequences, plus the HTNV 76-118 reference genome |
-| Temporal range | 1976 to 2023 |
-| Spatial resolution | Town (ri), municipality (si or gun), and province |
-| Metadata fields | Strain name, lineage designation, host species, collection date, GenBank accession number, and geographic coordinates |
+| Temporal range | 1997 to 2023 (HTNV 76-118 reference: 1976) |
+| Spatial resolution | Town (ri or dong), municipality (si or gun), and province |
+| Metadata fields | Strain name, lineage designation, host species, collection date, GenBank accession number, and locality (country, province, city, town) |
 
 <!-- TODO: add inclusion and exclusion criteria to DOCS.md -->
 
@@ -237,7 +253,7 @@ If you use HantaCon in your research, please cite:
 <!-- TODO: replace with the full citation and DOI once published -->
 > Park K, Kim J, Lee J, et al. Genomic surveillance of Hantaan virus for exposure-site investigation of haemorrhagic fever with renal syndrome: an integrated desktop workflow applied to military cases in the Republic of Korea. [Journal] ([Year]).
 
-HantaCon builds on Nextstrain, minimap2, SAMtools, BCFtools, BEDTools, SeqKit, MAFFT, IQ-TREE, TreeTime, Medaka, and Snakemake. Please also cite them where appropriate; full references are listed in [DOCS.md](DOCS.md).
+HantaCon builds on Nextstrain, minimap2, SAMtools, BCFtools, BEDTools, MAFFT, IQ-TREE, TreeTime, Medaka, and Snakemake. Please also cite them where appropriate; full references are listed in [DOCS.md](DOCS.md).
 
 ## License
 
