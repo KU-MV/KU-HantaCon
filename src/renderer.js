@@ -199,7 +199,13 @@ window.addEventListener('DOMContentLoaded', () => {
             variant_depth_threshold: 50,
             low_cov_threshold: 5
         };
-        Params.prefix = prefixInput.value;
+        Params.prefix = prefixInput.value.trim();
+
+        // the prefix is used unquoted in shell commands inside the container
+        if (!/^[A-Za-z0-9_-]+$/.test(Params.prefix)) {
+            showToast("Sample prefix may contain only letters, numbers, '-' and '_'.", "error");
+            return;
+        }
         Params.reference = document.getElementById('reference')?.value || "";
 
         // 숫자 입력 값 읽기
@@ -270,6 +276,9 @@ window.addEventListener('DOMContentLoaded', () => {
             logEl.innerHTML += `<span class="error">${data.data}</span>\n`;
             logEl.scrollTop = logEl.scrollHeight;
             logModal.classList.add("show");
+            workflowProgress.classList.remove("running");
+            workflowProgress.classList.add("error");
+            workflowStatus.textContent = "Error";
             break;
 
         // ================= Progress =================
@@ -294,13 +303,6 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
 
-        // ================= Error =================
-        case "error":
-            workflowProgress.classList.remove("running");
-            workflowProgress.classList.add("error");
-
-            workflowStatus.textContent = "Error";
-            break;
 
 
         // ================= End =================

@@ -170,7 +170,11 @@ const Phylodynamic = {
       cmd: [
         "snakemake -c 4",
         "cp {{htvDir}}/auspice/htv_{{fastaType}}.json {{resultDir}}/htv_{{fastaType}}.json",
-        "cp {{htvDir}}/auspice/htv_{{fastaType}}.json {{auspiceDir}}/{{runId}}_htv_{{fastaType}}.json"
+        "cp {{htvDir}}/auspice/htv_{{fastaType}}_tip-frequencies.json {{resultDir}}/htv_{{fastaType}}_tip-frequencies.json",
+        "cp {{htvDir}}/auspice/htv_{{fastaType}}_root-sequence.json {{resultDir}}/htv_{{fastaType}}_root-sequence.json",
+        "cp {{htvDir}}/auspice/htv_{{fastaType}}.json {{auspiceDir}}/{{runId}}_htv_{{fastaType}}.json",
+        "cp {{htvDir}}/auspice/htv_{{fastaType}}_tip-frequencies.json {{auspiceDir}}/{{runId}}_htv_{{fastaType}}_tip-frequencies.json",
+        "cp {{htvDir}}/auspice/htv_{{fastaType}}_root-sequence.json {{auspiceDir}}/{{runId}}_htv_{{fastaType}}_root-sequence.json"
       ],
       output: {
         auspice_json: "{{resultDir}}/htv_{{fastaType}}.json"

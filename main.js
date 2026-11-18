@@ -25,7 +25,7 @@ const auspiceDir = path.join(workspaceDir, 'auspice');
 const composeFile = path.join(HantaConBase, "docker-compose.yml")
 const resultDir = path.join(workspaceDir, 'result');
 
-if (!fs.existsSync(HantaConBase)) fs.mkdirSync(HantaConBase);
+if (!fs.existsSync(HantaConBase)) fs.mkdirSync(HantaConBase, { recursive: true });
 if (!fs.existsSync(workspaceDir)) fs.mkdirSync(workspaceDir);
 if (!fs.existsSync(auspiceDir)) fs.mkdirSync(auspiceDir);
 if (!fs.existsSync(resultDir)) fs.mkdirSync(resultDir);
@@ -47,7 +47,13 @@ dockerFiles.forEach(file => {
 
   // 파일이 없으면 복사
   if (!fs.existsSync(destPath)) {
-    fs.copyFileSync(srcPath, destPath);
+    if (file === '.env' && process.platform === 'linux') {
+      // Linux: run containers as the current user so result files stay editable
+      const { uid, gid } = os.userInfo();
+      fs.writeFileSync(destPath, `UID=${uid}\nGID=${gid}\n`);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
     console.log(`Copied ${file} to workspace`);
   }
 });
@@ -162,7 +168,10 @@ ipcMain.handle('run-workflow', (event, params) => {
       }
     });
 
+    let hadError = false;
+
     worker.on('message', (data) => {
+      if (data && data.type === 'error') hadError = true;
       mainWindow.webContents.send('workflow-log', data);
     });
 
@@ -175,12 +184,13 @@ ipcMain.handle('run-workflow', (event, params) => {
     worker.on('exit', (code) => {
 
       workflowRunning = false;
-      mainWindow.webContents.send('workflow-log', {"type": "work end", "data": "COMPLETE"});
-      if (code === 0) {
+      const ok = code === 0 && !hadError;
+      mainWindow.webContents.send('workflow-log', {"type": "work end", "data": ok ? "COMPLETE" : "error"});
+      if (ok) {
         
         resolve();
       } else {
-        reject(new Error(`Worker stopped with exit code ${code}`));
+        reject(new Error(hadError ? 'Workflow step failed' : `Worker stopped with exit code ${code}`));
       }
 
     });
