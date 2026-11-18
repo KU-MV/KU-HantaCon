@@ -1,8 +1,9 @@
 {
   "name": "hantacon",
   "version": "1.1.5",
-  "description": "The HanaCon was developed and maintained by a laboratory leaded by Prof. Jin-Won Song at Korea University, Republic of Korea.",
-  "main": "main.js","stackblitz": {},
+  "description": "HantaCon was developed and is maintained by the laboratory led by Prof. Jin-Won Song at Korea University, Republic of Korea.",
+  "main": "main.js",
+  "stackblitz": {},
   "scripts": {
     "start": "electron .",
     "build:linux": "electron-builder --linux",
@@ -22,9 +23,8 @@
   },
   "homepage": "https://github.com/KU-MV/KU-HantaCon#readme",
   "devDependencies": {
-    "electron": "latest",
-    "electron-builder": "^26.8.1",
-    "electron-icon-builder": "^2.0.1"
+    "electron": "45.3.4",
+    "electron-builder": "^26.8.1"
   },
   "build": {
     "productName": "HantaCon",
@@ -36,7 +36,7 @@
         "deb"
       ],
       "category": "Utility",
-      "description": "The HanaCon was developed and maintained by a laboratory leaded by Prof. Jin-Won Song at Korea University, Republic of Korea.",
+      "description": "HantaCon was developed and is maintained by the laboratory led by Prof. Jin-Won Song at Korea University, Republic of Korea.",
       "icon": "./resources/256x256.png"
     },
     "mac": {
@@ -84,11 +84,13 @@
     "files": [
       "main.js",
       "package.json",
-      "preload.js",
       "workerWorkflow.js",
       "workflow.js",
       "src/**/*",
       "resources/**/*"
     ]
+  },
+  "engines": {
+    "node": ">=22.12.0"
   }
 }
