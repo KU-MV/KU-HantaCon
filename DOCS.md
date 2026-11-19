@@ -195,7 +195,7 @@ Note that HantaCon copies the Docker files into `~/Desktop/HantaCon` only when t
 ## Troubleshooting
 
 **`node -v` prints a version lower than 22.12, or `npm install` reports an unsupported engine.**
-Install the current LTS release of Node.js as described in the [README](README.md#installation). On Ubuntu, `sudo apt install nodejs` without the NodeSource step installs a version that is too old.
+Install the current LTS release of Node.js as described in the [README](README.md#prerequisites). On Ubuntu, `sudo apt install nodejs` without the NodeSource step installs a version that is too old.
 
 **`permission denied while trying to connect to the Docker daemon socket` (Linux).**
 Your account is not yet in the `docker` group. Run `sudo usermod -aG docker $USER`, log out, log back in, and try again.
