@@ -121,7 +121,7 @@ HantaCon is built into a desktop application (`.dmg` on macOS, `.deb` on Ubuntu)
 
 4. Start Docker, then open HantaCon from Applications (macOS) or the applications menu (Ubuntu).
 
-Prebuilt packages, when published, are on the [Releases](https://github.com/KU-MV/KU-HantaCon/releases) page. With a downloaded package, steps 1 and 2 are not needed. A downloaded macOS package is not notarized, so macOS may block the first launch; allow it under System Settings, Privacy & Security.
+Prebuilt packages are on the [Releases](https://github.com/KU-MV/KU-HantaCon/releases) page (macOS `.dmg` for Apple silicon and Intel; the Ubuntu `.deb` will be added). With a downloaded package, steps 1 and 2 are not needed. A downloaded macOS package is not notarized, so macOS may block the first launch; allow it under System Settings, Privacy & Security.
 
 ### Updating
 
