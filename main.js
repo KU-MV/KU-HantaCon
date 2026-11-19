@@ -61,10 +61,17 @@ dockerFiles.forEach(file => {
 
 let mainWindow;
 
+// App icon. Packaged builds take the icon from package.json (build.mac.icon / build.linux.icon);
+// these lines set it when running from source with `npm start`.
+const iconPath = path.join(__dirname, 'resources', 'icons', 'png', '512x512.png');
+
 app.whenReady().then(() => {
+  if (process.platform === 'darwin' && !app.isPackaged) app.dock.setIcon(iconPath);
+
   mainWindow = new BrowserWindow({
     width: 1000,
     height: 700,
+    icon: iconPath,
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'src', 'preload.js'),
