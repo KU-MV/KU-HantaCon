@@ -58,6 +58,8 @@
       ],
       "category": "public.app-category.utilities",
       "icon": "./resources/icons/mac/icon.icns",
+      "identity": "-",
+      "hardenedRuntime": false,
       "darkModeSupport": true
     },
     "dmg": {
