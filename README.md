@@ -31,38 +31,33 @@ HantaCon integrates an Electron-based graphical user interface with a Docker-con
 - Free disk space for Docker Desktop, Node.js, and the HantaCon Docker images (the images use about 6.5 GB)
 - Internet connection for the first installation and the first analysis
 
-Three programs must be installed first: **Docker**, **Node.js** (version 22.12 or later), and **Git**. The steps below install all three. All bioinformatics tools run inside Docker and do not need to be installed separately. The full tool list is in [DOCS.md](DOCS.md).
+Docker, Node.js, and Git are installed in [Prerequisites](#prerequisites). All bioinformatics tools run inside Docker and do not need to be installed separately. The full tool list is in [DOCS.md](DOCS.md).
 
 Runtime reference (benchmark hardware, not a minimum requirement): for the datasets described in the associated study, analysis of the L, M, and S segments, from prepared FASTQ reads through consensus generation to localized Nextstrain visualization, completed within approximately 15 minutes on a MacBook Pro (Apple M3 Pro, 36 GB RAM), excluding sequencing and manual gap-filling time.
 
-## Installation
+## Prerequisites
 
-Commands are typed in the **Terminal** app (macOS: press Cmd+Space, type `Terminal`, press Enter; Ubuntu: press Ctrl+Alt+T). Copy each block, paste it into Terminal, and press Enter.
+Install these three programs first.
+
+| Program | Needed for |
+|---|---|
+| Docker | Running analyses. Always required. |
+| Node.js 22.12 or later | Building HantaCon (see [Installation](#installation)). |
+| Git | Downloading the source code. |
 
 **macOS**
 
-1. Install Docker Desktop. Check your chip under Apple menu > About This Mac (Apple M-series = Apple silicon). Download the matching version from [docs.docker.com/desktop/setup/install/mac-install](https://docs.docker.com/desktop/setup/install/mac-install/), open `Docker.dmg`, and drag Docker to Applications. Open Docker from Applications. Signing in is optional (press **Skip**). Wait until the bottom-left corner shows **Engine running**.
-2. Install Node.js. Download the **LTS macOS Installer (.pkg)** from [nodejs.org/en/download](https://nodejs.org/en/download) and run it. Your Mac password is required.
-3. Check both, in Terminal:
+1. Install Docker Desktop for your chip (Apple silicon or Intel) from [docs.docker.com/desktop/setup/install/mac-install](https://docs.docker.com/desktop/setup/install/mac-install/). Open `Docker.dmg`, drag Docker to Applications, and open Docker. Signing in is optional (press **Skip**). Wait until Docker Desktop shows **Engine running**.
+2. Install Node.js: download the **LTS macOS Installer (.pkg)** from [nodejs.org/en/download](https://nodejs.org/en/download) and run it.
+3. Check all three:
 
    ```bash
-   node -v
    docker compose version
+   node -v
+   git --version
    ```
 
-   `node -v` must print `v22.12` or higher. If macOS asks to install the command line developer tools when you first use `git`, press **Install**.
-
-4. Download and start HantaCon:
-
-   ```bash
-   cd ~
-   git clone https://github.com/KU-MV/KU-HantaCon.git
-   cd KU-HantaCon
-   npm install
-   npm start
-   ```
-
-   `npm install` may end with a message such as `11 vulnerabilities` and suggest `npm audit fix --force`. Ignore it; do not run `npm audit fix`.
+   `node -v` must print `v22.12` or higher. If macOS offers to install the command line developer tools at `git --version`, press **Install**; this installs Git.
 
 **Ubuntu Linux**
 
@@ -84,60 +79,111 @@ Commands are typed in the **Terminal** app (macOS: press Cmd+Space, type `Termin
 2. **Log out and log back in**, so that Docker can be used without `sudo`. Then check:
 
    ```bash
-   node -v
    docker run hello-world
+   node -v
+   git --version
    ```
 
-   `node -v` must print `v22.12` or higher, and `docker run hello-world` must print a "Hello from Docker!" message.
+   `docker run hello-world` must print a "Hello from Docker!" message, and `node -v` must print `v22.12` or higher.
 
-3. Download and start HantaCon:
+## Installation
+
+HantaCon is built into a desktop application (`.dmg` on macOS, `.deb` on Ubuntu) and then installed and opened like any other program.
+
+1. Download the source code and its dependencies:
 
    ```bash
    cd ~
    git clone https://github.com/KU-MV/KU-HantaCon.git
    cd KU-HantaCon
    npm install
-   npm start
    ```
 
-   On Ubuntu 24.04 or later, if `npm start` stops with `The SUID sandbox helper binary was found, but is not configured correctly`, run the two commands under that error in [DOCS.md](DOCS.md#troubleshooting) once, then `npm start` again.
+   `npm install` may end with a message such as `11 vulnerabilities` and suggest `npm audit fix --force`. Ignore it; do not run `npm audit fix`.
 
-**Starting HantaCon again later**
+2. Build the package:
 
-Start Docker first (macOS: open Docker Desktop), then:
+   ```bash
+   npm run build:mac        # macOS, about 1 minute
+   npm run build:linux      # Ubuntu Linux
+   ```
+
+   The package is written to the `dist` folder. Building only creates the package; it does not install it.
+
+3. Install the package:
+
+   - macOS: run `open dist`, double-click `HantaCon-<version>-arm64.dmg` (Apple silicon) or `HantaCon-<version>.dmg` (Intel), and drag HantaCon to Applications.
+   - Ubuntu Linux:
+
+     ```bash
+     sudo apt install ./dist/hantacon_*.deb
+     ```
+
+4. Start Docker, then open HantaCon from Applications (macOS) or the applications menu (Ubuntu).
+
+Prebuilt packages, when published, are on the [Releases](https://github.com/KU-MV/KU-HantaCon/releases) page. With a downloaded package, steps 1 and 2 are not needed. A downloaded macOS package is not notarized, so macOS may block the first launch; allow it under System Settings, Privacy & Security.
+
+### Updating
+
+```bash
+cd ~/KU-HantaCon
+git pull
+npm install
+npm run build:mac        # Ubuntu: npm run build:linux
+cd ~/Desktop/HantaCon && docker compose down --rmi local && rm dockerfile env.yml docker-compose.yml
+```
+
+Then install the new package as in step 3 (macOS: choose **Replace** when dragging to Applications).
+
+The last line removes the old analysis environment. HantaCon copies the new Docker files at the next start and rebuilds the environment at the next analysis.
+
+### Uninstalling
+
+Back up anything you need from `~/Desktop/HantaCon/workspace/result` first, then:
+
+**Ubuntu Linux**
+
+```bash
+sudo apt remove hantacon
+cd ~/Desktop/HantaCon && docker compose down --rmi all --remove-orphans
+rm -rf ~/Desktop/HantaCon
+```
+
+**macOS**
+
+```bash
+cd ~/Desktop/HantaCon && docker compose down --rmi all --remove-orphans
+rm -rf ~/Desktop/HantaCon
+```
+
+Then drag HantaCon from Applications to the Trash.
+
+`--rmi all` also removes the `nextstrain/base` image. Docker, Node.js, and Git stay installed. If you built from source, also remove the source folder with `rm -rf ~/KU-HantaCon`.
+
+### Appendix: running from the terminal with `npm start`
+
+The installed application is opened like any other program and runs on its own. Alternatively, HantaCon can be run directly from the source folder in the terminal, the way command-line tools are run. Nothing is built or installed, and HantaCon quits when that terminal session ends. This is useful for testing changes to the source code.
 
 ```bash
 cd ~/KU-HantaCon
 npm start
 ```
 
-Keep the Terminal window open while HantaCon is running. To quit, close the HantaCon window.
+On Ubuntu 24.04 or later, if `npm start` stops with `The SUID sandbox helper binary was found, but is not configured correctly`, run the two commands under that error in [DOCS.md](DOCS.md#troubleshooting) once, then `npm start` again.
 
-**Updating**
+npm commands, run inside the `KU-HantaCon` folder:
 
-```bash
-cd ~/KU-HantaCon
-git pull
-npm install
-cd ~/Desktop/HantaCon && docker compose down --rmi local && rm dockerfile env.yml docker-compose.yml
-```
+| Command | What it does |
+|---|---|
+| `npm install` | Downloads the dependencies pinned in `package-lock.json` into `node_modules`. Run after cloning and after each `git pull`. |
+| `npm start` | Runs HantaCon from the source folder without building or installing it. |
+| `npm run build:mac` | Builds `.dmg` and `.zip` packages for Apple silicon (arm64) and Intel (x64) into `dist/`. Must be run on a Mac. |
+| `npm run build:linux` | Builds a `.deb` package into `dist/`. |
+| `npm run build` | Runs both builds. |
 
-The last line removes the old analysis environment. HantaCon copies the new Docker files at the next start and rebuilds the environment at the next analysis.
+## Running an analysis
 
-**Uninstalling**
-
-Back up anything you need from `~/Desktop/HantaCon/workspace/result` first, then:
-
-```bash
-cd ~/Desktop/HantaCon && docker compose down --rmi all --remove-orphans
-rm -rf ~/Desktop/HantaCon ~/KU-HantaCon
-```
-
-`--rmi all` also removes the `nextstrain/base` image. Docker and Node.js stay installed.
-
-Building the distributable `.dmg` and `.deb` packages is described in [DOCS.md](DOCS.md).
-
-## First launch
+### First launch
 
 Make sure Docker is running before opening HantaCon (macOS: Docker Desktop shows **Engine running**).
 
@@ -145,7 +191,7 @@ On launch, HantaCon creates its working directory at `~/Desktop/HantaCon` and wr
 
 The backend containers are built the first time an analysis is started, not at launch. The first Sequence run builds the `hantacon_core` image, and the first Phylodynamics run downloads the `nextstrain/base` image. Together these download several GB. During the download the application log may show no new lines for several minutes; this is normal. Later runs start immediately.
 
-## Quick start
+### Example: full analysis
 
 **Example data.** The example uses public Oxford Nanopore reads of sample Aa19-167 (SRA run SRR22029858, BioProject PRJNA893834) from:
 
@@ -181,7 +227,7 @@ The reference database already contains this sample as `HTNV_Aa19-167`.
 
 Location names must be spelled as in the bundled coordinate table (capitalization is ignored), for example `South Korea`, not `Korea`. Leave a field empty if it is unknown. The list of accepted names is in [DOCS.md](DOCS.md#supported-location-names).
 
-## Usage
+### Tabs
 
 HantaCon supports two analysis modes:
 
@@ -190,13 +236,13 @@ HantaCon supports two analysis modes:
 
 The interface is organized into five tabs: **Home**, **Sequence**, **Phylodynamics**, **Visualization**, and **Settings**.
 
-### 1. Home
+#### 1. Home
 
 <img src="src/img/screenshots/1.png" alt="Home tab" width="640">
 
 The Home tab shows an overview of HantaCon and lab/administrator information.
 
-### 2. Sequence: consensus generation
+#### 2. Sequence: consensus generation
 
 <img src="src/img/screenshots/2.png" alt="Consensus sequence tab" width="640">
 
@@ -212,7 +258,7 @@ Press **Generate** to run the workflow. Reads are aligned to the tripartite refe
 
 Variant calling uses the Medaka model `r941_prom_sup_variant_g507` (R9.4.1 flow cells, super-accuracy basecalling).
 
-### 3. Phylodynamics: metadata and phylogenetic analysis
+#### 3. Phylodynamics: metadata and phylogenetic analysis
 
 <img src="src/img/screenshots/3.png" alt="Phylodynamic analysis tab" width="640">
 
@@ -220,7 +266,7 @@ Select a consensus FASTA file and the corresponding genomic segment (L, M, or S)
 
 Only the first sequence in the selected FASTA file is analyzed, and its name (the FASTA header up to the first space) must not already exist in the reference database. Press **Generate metadata** to build the dataset and run the segment-specific analysis against the bundled reference database. Each segment is analyzed separately.
 
-### 4. Visualization: interactive exploration
+#### 4. Visualization: interactive exploration
 
 <img src="src/img/screenshots/4.png" alt="Visualization analysis tab" width="640">
 
@@ -228,7 +274,7 @@ Only the first sequence in the selected FASTA file is analyzed, and its name (th
 
 Tips can be coloured by metadata field, filtered by query, and restricted to a date range. The Geography panel maps sequences by their annotated locality, the entropy panel shows nucleotide diversity across the genome, and the frequency panel shows tip frequencies over time.
 
-### 5. Settings: backend management
+#### 5. Settings: backend management
 
 **Restart Services** starts the backend containers again. **Reinstall Services** downloads the latest `nextstrain/base` image and recreates both containers. Use these if an analysis stops with a Docker error. To rebuild the `hantacon_core` image, see [DOCS.md](DOCS.md#rebuilding-the-backend).
 
