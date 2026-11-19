@@ -165,7 +165,7 @@ npm run build:mac     # .dmg and .zip for x64 and arm64
 npm run build         # both
 ```
 
-Icons come from `build.mac.icon` (`resources/icons/mac/icon.icns`) and `build.linux.icon` (`resources/256x256.png`) in `package.json`. macOS builds are not code-signed or notarized, so the first launch on another machine must be allowed under System Settings, Privacy & Security. Build the macOS package on a Mac; electron-builder does not support building it on Linux.
+Icons come from `build.mac.icon` (`resources/icons/mac/icon.icns`) and `build.linux.icon` (`resources/256x256.png`) in `package.json`. macOS builds are ad-hoc signed (`identity: "-"`, `hardenedRuntime: false`), not signed with a Developer ID or notarized, so the first launch of a downloaded package must be allowed under System Settings, Privacy & Security (**Open Anyway**). Without ad-hoc signing of the whole bundle, macOS rejects a downloaded package as damaged. Build the macOS package on a Mac; electron-builder does not support building it on Linux.
 
 ## Rebuilding the backend
 
