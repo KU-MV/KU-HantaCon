@@ -135,7 +135,7 @@ npm run build:mac        # Ubuntu: npm run build:linux
 cd ~/Desktop/HantaCon && docker compose down --rmi local && rm dockerfile env.yml docker-compose.yml
 ```
 
-Then install the new package as in step 3 (macOS: choose **Replace** when dragging to Applications).
+Then install the new package as in step 3 (macOS: choose **Replace** when dragging to Applications). With a downloaded package, install the newer package from Releases instead of the first four lines, and run the last line.
 
 The last line removes the old analysis environment. HantaCon copies the new Docker files at the next start and rebuilds the environment at the next analysis.
 
@@ -199,11 +199,11 @@ The backend containers are built the first time an analysis is started, not at l
 
 > Park K, Lee S-H, Kim J, et al. Multiplex PCR-Based Nanopore Sequencing and Epidemiological Surveillance of *Hantaan orthohantavirus* in *Apodemus agrarius*, Republic of Korea. *Viruses* 13, 847 (2021). https://doi.org/10.3390/v13050847
 
-Download the reads (about 95 MB; this can take several minutes) into the Downloads folder:
+Download the reads (about 95 MB; this can take several minutes) into the Downloads folder. The server sometimes drops the connection; `--retry` restarts the download automatically.
 
 ```bash
 cd ~/Downloads
-curl -O https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR220/058/SRR22029858/SRR22029858_1.fastq.gz
+curl -O --retry 5 --retry-all-errors https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR220/058/SRR22029858/SRR22029858_1.fastq.gz
 gunzip SRR22029858_1.fastq.gz
 ```
 
