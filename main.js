@@ -8,6 +8,8 @@ const os = require('os');
 // main.js 상단
 if (process.platform === 'darwin') {
   process.env.PATH = [
+    path.join(os.homedir(), '.docker', 'bin'),             // Docker Desktop, per-user install
+    '/Applications/Docker.app/Contents/Resources/bin',      // Docker Desktop CLI tools
     '/usr/local/bin',
     '/opt/homebrew/bin',
     '/usr/bin',
