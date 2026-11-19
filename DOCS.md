@@ -155,7 +155,7 @@ Installation steps for macOS and Ubuntu are in the [README](README.md#installati
 
 Electron is pinned to 45.3.4, which requires Node.js 22.12 or later (`engines` in `package.json`). `package-lock.json` is committed, so `npm install` installs the same dependency versions on every machine.
 
-When run with `npm start`, the app runs as the generic Electron executable, so the Dock or taskbar shows the Electron icon and name. The HantaCon icon is applied to packaged builds (see below).
+Packaged builds take their icon from `package.json` (see below). When run with `npm start`, `main.js` sets the same icon on the window and, on macOS, the Dock.
 
 ## Building distributable packages
 
@@ -209,6 +209,9 @@ sudo chmod 4755 node_modules/electron/dist/chrome-sandbox
 ```
 
 Repeat after `npm install` replaces the Electron runtime.
+
+**An analysis fails with `[Docker Error] exit 127`.**
+The `docker` command was not found. Install Docker Desktop and open it once. On macOS, HantaCon looks for `docker` in `~/.docker/bin`, `/Applications/Docker.app/Contents/Resources/bin`, `/usr/local/bin`, and `/opt/homebrew/bin`, because applications opened from Finder do not see the Terminal `PATH`. Packages built before this search was added show this error when opened from Applications; rebuild and reinstall as in the [README](README.md#updating).
 
 **An analysis fails immediately with a Docker error.**
 Check that Docker is running (macOS: Docker Desktop shows **Engine running**) and that `docker compose version` works in Terminal. Then press **Restart Services** in the Settings tab.

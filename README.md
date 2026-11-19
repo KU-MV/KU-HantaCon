@@ -37,32 +37,29 @@ Runtime reference (benchmark hardware, not a minimum requirement): for the datas
 
 ## Installation
 
-Commands are typed in the **Terminal** app (macOS: press Cmd+Space, type `Terminal`, press Enter; Ubuntu: press Ctrl+Alt+T). Copy each block, paste it into Terminal, and press Enter.
+HantaCon is installed as a desktop application: a `.dmg` on macOS and a `.deb` on Ubuntu. Install the prerequisites (step 1), then install the application (step 2).
+
+### Step 1. Install the prerequisites
+
+| Program | Needed for |
+|---|---|
+| Docker | Running analyses. Always required. |
+| Node.js 22.12 or later | Building HantaCon from source (step 2, option B) and `npm start`. |
+| Git | Downloading the source code (step 2, option B). |
 
 **macOS**
 
-1. Install Docker Desktop. Check your chip under Apple menu > About This Mac (Apple M-series = Apple silicon). Download the matching version from [docs.docker.com/desktop/setup/install/mac-install](https://docs.docker.com/desktop/setup/install/mac-install/), open `Docker.dmg`, and drag Docker to Applications. Open Docker from Applications. Signing in is optional (press **Skip**). Wait until the bottom-left corner shows **Engine running**.
-2. Install Node.js. Download the **LTS macOS Installer (.pkg)** from [nodejs.org/en/download](https://nodejs.org/en/download) and run it. Your Mac password is required.
-3. Check both, in Terminal:
+1. Install Docker Desktop for your chip (Apple silicon or Intel) from [docs.docker.com/desktop/setup/install/mac-install](https://docs.docker.com/desktop/setup/install/mac-install/). Open `Docker.dmg`, drag Docker to Applications, and open Docker. Signing in is optional (press **Skip**). Wait until Docker Desktop shows **Engine running**.
+2. Install Node.js: download the **LTS macOS Installer (.pkg)** from [nodejs.org/en/download](https://nodejs.org/en/download) and run it.
+3. Check all three:
 
    ```bash
-   node -v
    docker compose version
+   node -v
+   git --version
    ```
 
-   `node -v` must print `v22.12` or higher. If macOS asks to install the command line developer tools when you first use `git`, press **Install**.
-
-4. Download and start HantaCon:
-
-   ```bash
-   cd ~
-   git clone https://github.com/KU-MV/KU-HantaCon.git
-   cd KU-HantaCon
-   npm install
-   npm start
-   ```
-
-   `npm install` may end with a message such as `11 vulnerabilities` and suggest `npm audit fix --force`. Ignore it; do not run `npm audit fix`.
+   `node -v` must print `v22.12` or higher. If macOS offers to install the command line developer tools at `git --version`, press **Install**; this installs Git.
 
 **Ubuntu Linux**
 
@@ -84,58 +81,112 @@ Commands are typed in the **Terminal** app (macOS: press Cmd+Space, type `Termin
 2. **Log out and log back in**, so that Docker can be used without `sudo`. Then check:
 
    ```bash
-   node -v
    docker run hello-world
+   node -v
+   git --version
    ```
 
-   `node -v` must print `v22.12` or higher, and `docker run hello-world` must print a "Hello from Docker!" message.
+   `docker run hello-world` must print a "Hello from Docker!" message, and `node -v` must print `v22.12` or higher.
 
-3. Download and start HantaCon:
+### Step 2. Install HantaCon as an application
+
+**Option A. Download a package**
+
+Download the package for your platform from the [Releases](https://github.com/KU-MV/KU-HantaCon/releases) page.
+
+- Ubuntu Linux:
+
+  ```bash
+  sudo apt install ./hantacon_<version>_amd64.deb
+  ```
+
+- macOS: open the downloaded `.dmg` and drag HantaCon to Applications. The application is not notarized, so macOS may block the first launch. Allow it under System Settings, Privacy & Security.
+
+**Option B. Build the package from source**
+
+1. Download the source code and its dependencies:
 
    ```bash
    cd ~
    git clone https://github.com/KU-MV/KU-HantaCon.git
    cd KU-HantaCon
    npm install
-   npm start
    ```
 
-   On Ubuntu 24.04 or later, if `npm start` stops with `The SUID sandbox helper binary was found, but is not configured correctly`, run the two commands under that error in [DOCS.md](DOCS.md#troubleshooting) once, then `npm start` again.
+   `npm install` may end with a message such as `11 vulnerabilities` and suggest `npm audit fix --force`. Ignore it; do not run `npm audit fix`.
 
-**Starting HantaCon again later**
+2. Build and install the package.
 
-Start Docker first (macOS: open Docker Desktop), then:
+   macOS (about 1 minute):
 
-```bash
-cd ~/KU-HantaCon
-npm start
-```
+   ```bash
+   npm run build:mac
+   open dist
+   ```
 
-Keep the Terminal window open while HantaCon is running. To quit, close the HantaCon window.
+   In the `dist` folder that opens, double-click `HantaCon-<version>-arm64.dmg` (Apple silicon) or `HantaCon-<version>.dmg` (Intel), and drag HantaCon to Applications.
 
-**Updating**
+   Ubuntu Linux:
+
+   ```bash
+   npm run build:linux
+   sudo apt install ./dist/hantacon_*.deb
+   ```
+
+3. Start Docker, then open HantaCon from Applications (macOS) or the applications menu (Ubuntu).
+
+### npm commands
+
+Run these inside the `KU-HantaCon` folder.
+
+| Command | What it does |
+|---|---|
+| `npm install` | Downloads the dependencies pinned in `package-lock.json` into `node_modules`. Run after cloning and after each `git pull`. |
+| `npm start` | Runs HantaCon directly from the source folder, without building or installing it. HantaCon quits when this Terminal session ends. |
+| `npm run build:mac` | Builds `.dmg` and `.zip` packages for Apple silicon (arm64) and Intel (x64) into `dist/`. Must be run on a Mac. |
+| `npm run build:linux` | Builds a `.deb` package into `dist/`. |
+| `npm run build` | Runs both builds. |
+
+On Ubuntu 24.04 or later, if `npm start` stops with `The SUID sandbox helper binary was found, but is not configured correctly`, run the two commands under that error in [DOCS.md](DOCS.md#troubleshooting) once, then `npm start` again.
+
+### Updating
+
+For an installation built from source (option B):
 
 ```bash
 cd ~/KU-HantaCon
 git pull
 npm install
+npm run build:mac        # Ubuntu: npm run build:linux
 cd ~/Desktop/HantaCon && docker compose down --rmi local && rm dockerfile env.yml docker-compose.yml
 ```
 
+Then install the new package as in step 2 (macOS: choose **Replace** when dragging to Applications). For option A, install the newer package from Releases and run the last line above.
+
 The last line removes the old analysis environment. HantaCon copies the new Docker files at the next start and rebuilds the environment at the next analysis.
 
-**Uninstalling**
+### Uninstalling
 
 Back up anything you need from `~/Desktop/HantaCon/workspace/result` first, then:
 
+**Ubuntu Linux**
+
 ```bash
+sudo apt remove hantacon
 cd ~/Desktop/HantaCon && docker compose down --rmi all --remove-orphans
-rm -rf ~/Desktop/HantaCon ~/KU-HantaCon
+rm -rf ~/Desktop/HantaCon
 ```
 
-`--rmi all` also removes the `nextstrain/base` image. Docker and Node.js stay installed.
+**macOS**
 
-Building the distributable `.dmg` and `.deb` packages is described in [DOCS.md](DOCS.md).
+```bash
+cd ~/Desktop/HantaCon && docker compose down --rmi all --remove-orphans
+rm -rf ~/Desktop/HantaCon
+```
+
+Then drag HantaCon from Applications to the Trash.
+
+`--rmi all` also removes the `nextstrain/base` image. Docker, Node.js, and Git stay installed. If you built from source, also remove the source folder with `rm -rf ~/KU-HantaCon`.
 
 ## First launch
 
