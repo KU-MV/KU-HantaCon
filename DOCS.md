@@ -44,7 +44,9 @@ The input is one uncompressed FASTQ file per sample (`.fastq` or `.fq`; `.gz` fi
 
 ```bash
 cat barcode01/*.fastq.gz | gunzip > sample01.fastq
-``` The consensus thresholds can be adjusted:
+```
+
+The consensus thresholds can be adjusted:
 
 | Parameter | Default |
 |---|---|
