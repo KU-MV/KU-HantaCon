@@ -119,9 +119,14 @@ HantaCon is built into a desktop application (`.dmg` on macOS, `.deb` on Ubuntu)
      sudo apt install ./dist/hantacon_*.deb
      ```
 
-4. Start Docker, then open HantaCon from Applications (macOS) or the applications menu (Ubuntu).
+4. Start Docker, then open HantaCon from Applications (macOS), or from the applications menu or with the `hantacon` command (Ubuntu).
 
-Prebuilt packages are on the [Releases](https://github.com/KU-MV/KU-HantaCon/releases) page (macOS `.dmg` for Apple silicon and Intel; the Ubuntu `.deb` will be added). With a downloaded package, steps 1 and 2 are not needed.
+Prebuilt packages are on the [Releases](https://github.com/KU-MV/KU-HantaCon/releases) page (macOS `.dmg` for Apple silicon and Intel; the Ubuntu `.deb` will be added). With a downloaded package, steps 1 and 2 are not needed, and Node.js and Git are not required. The Ubuntu `.deb` is for x86-64 (amd64) computers; install it from the folder it was downloaded to:
+
+```bash
+cd ~/Downloads
+sudo apt install ./hantacon_<version>_amd64.deb
+```
 
 A downloaded macOS package is not notarized. At the first launch, macOS reports that Apple cannot verify that HantaCon is free of malware. Press **Done**, open System Settings > Privacy & Security, press **Open Anyway** next to the message about HantaCon, and confirm with your password.
 
@@ -187,7 +192,7 @@ npm commands, run inside the `KU-HantaCon` folder:
 
 ### First launch
 
-Make sure Docker is running before opening HantaCon (macOS: Docker Desktop shows **Engine running**).
+Make sure Docker is running before opening HantaCon (macOS: Docker Desktop shows **Engine running**; Ubuntu: `docker info` prints no error).
 
 On launch, HantaCon creates its working directory at `~/Desktop/HantaCon` and writes its Docker Compose configuration there. Analysis inputs, intermediate files, and results are all kept under that directory.
 
