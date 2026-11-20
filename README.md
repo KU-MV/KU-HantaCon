@@ -66,7 +66,7 @@ Runtime reference (benchmark hardware, not a minimum requirement): for the datas
    sudo apt install ./hantacon_*_amd64.deb
    ```
 
-   On Ubuntu installed in another language, the Downloads folder may have a translated name (for example `~/다운로드`); use that folder instead. `apt` also installs the system libraries HantaCon needs, and on Ubuntu 24.04 and later the package installs the AppArmor profile that the application's sandbox requires there.
+   On Ubuntu installed in another language, the Downloads folder may have a translated name; use that folder instead. `apt` also installs the system libraries HantaCon needs, and on Ubuntu 24.04 and later the package installs the AppArmor profile that the application's sandbox requires there.
 
 4. Open HantaCon from the applications menu, or run `hantacon` in a terminal.
 
