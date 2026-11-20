@@ -128,7 +128,7 @@ HantaCon is built into a desktop application (`.dmg` on macOS, `.deb` on Ubuntu)
 4. Start Docker, then open HantaCon:
 
    - macOS: open HantaCon from Applications.
-   - Ubuntu Linux: open **Show Apps** (or the applications menu), search for **HantaCon**, and click it. It can also be started with the `hantacon` command in a terminal.
+   - Ubuntu Linux: open HantaCon from the applications menu, or run `hantacon` in a terminal.
 
 **Installing a downloaded package.** Prebuilt packages are on the [Releases](https://github.com/KU-MV/KU-HantaCon/releases) page (macOS `.dmg` for Apple silicon and Intel; Ubuntu `.deb` for x86-64). With a downloaded package, steps 1 and 2 are not needed, and Node.js and Git are not required.
 
@@ -142,16 +142,36 @@ HantaCon is built into a desktop application (`.dmg` on macOS, `.deb` on Ubuntu)
 
 ### Updating
 
+For an installation built from source:
+
+**macOS**
+
 ```bash
 cd ~/KU-HantaCon
 git pull
 npm install
 rm -rf dist
-npm run build:mac        # Ubuntu: npm run build:linux
+npm run build:mac
 cd ~/Desktop/HantaCon && docker compose down --rmi local && rm dockerfile env.yml docker-compose.yml
 ```
 
-Then install the new package as in step 3 (macOS: choose **Replace** when dragging to Applications; Ubuntu: `sudo apt install` replaces the installed version). With a downloaded package, install the newer package from Releases instead of the first five lines, and run the last line.
+Then install the new `.dmg` as in step 3 and choose **Replace**.
+
+**Ubuntu Linux**
+
+```bash
+cd ~/KU-HantaCon
+git pull
+npm install
+rm -rf dist
+npm run build:linux
+sudo apt install ./dist/hantacon_*.deb
+cd ~/Desktop/HantaCon && docker compose down --rmi local && rm dockerfile env.yml docker-compose.yml
+```
+
+`sudo apt install` replaces the installed version.
+
+With a downloaded package, install the newer package from Releases as in [Installing a downloaded package](#installation), then run the last line of the block above.
 
 The last line removes the old analysis environment. HantaCon copies the new Docker files at the next start and rebuilds the environment at the next analysis.
 
