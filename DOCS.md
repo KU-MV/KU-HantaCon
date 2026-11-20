@@ -38,15 +38,7 @@ The Home tab shows an overview of HantaCon and lab/administrator information.
 
 <img src="src/img/screenshots/2.png" alt="Consensus sequence tab" width="640">
 
-Enter a sample prefix, select a FASTQ file, and choose the reference genome (HTNV_76-118 or HTNV_Ac20-5).
-
-The input is one uncompressed FASTQ file per sample (`.fastq` or `.fq`; `.gz` files cannot be selected). Nanopore runs usually write many `.fastq.gz` files per barcode; combine them into one file first, for example:
-
-```bash
-cat barcode01/*.fastq.gz | gunzip > sample01.fastq
-```
-
-The consensus thresholds can be adjusted:
+Enter a sample prefix, select a FASTQ file, and choose the reference genome (HTNV_76-118 or HTNV_Ac20-5). The consensus thresholds can be adjusted:
 
 | Parameter | Default |
 |---|---|
@@ -62,7 +54,7 @@ Variant calling uses the Medaka model `r941_prom_sup_variant_g507` (R9.4.1 flow 
 
 <img src="src/img/screenshots/3.png" alt="Phylodynamic analysis tab" width="640">
 
-Select a consensus FASTA file (`.fasta` or `.fa`) and the corresponding genomic segment (L, M, or S), then enter the sample information used for phylogeographic placement: host species, location (country, province, city, and town; leave a level empty when it is not available), and collection date.
+Select a consensus FASTA file and the corresponding genomic segment (L, M, or S), then enter the sample information used for phylogeographic placement: host species, location (country, province, city, and town; leave a level empty when it is not available), and collection date.
 
 Only the first sequence in the selected FASTA file is analyzed, and its name (the FASTA header up to the first space) must not already exist in the reference database. Press **Generate metadata** to build the dataset and run the segment-specific analysis against the bundled reference database. Each segment is analyzed separately.
 
@@ -245,14 +237,6 @@ npm start
 
 On Ubuntu 24.04 or later, if `npm start` stops with `The SUID sandbox helper binary was found, but is not configured correctly`, run the two commands under that error in [Troubleshooting](#troubleshooting) once, then `npm start` again.
 
-### Packaging notes
-
-Electron is pinned to 45.3.4, which requires Node.js 22.12 or later (`engines` in `package.json`). `package-lock.json` is committed, so `npm install` installs the same dependency versions on every machine.
-
-Packaged builds take their icon from `package.json` (see below). When run with `npm start`, `main.js` sets the same icon on the window and, on macOS, the Dock.
-
-Icons come from `build.mac.icon` (`resources/icons/mac/icon.icns`) and `build.linux.icon` (`resources/256x256.png`) in `package.json`. macOS builds are ad-hoc signed (`identity: "-"`, `hardenedRuntime: false`), not signed with a Developer ID or notarized, so the first launch of a downloaded package must be allowed under System Settings, Privacy & Security (**Open Anyway**). Without ad-hoc signing of the whole bundle, macOS rejects a downloaded package as damaged. Build the macOS package on a Mac; electron-builder does not support building it on Linux.
-
 ## Architecture
 
 HantaCon has two parts.
@@ -313,7 +297,7 @@ Installed in the `hantacon_core` image from `resources/docker/env.yml`:
 
 Augur, IQ-TREE, TreeTime, and Snakemake come from the `nextstrain/base` image and are not installed in `hantacon_core`.
 
-All versions are pinned in `env.yml`, and packages come only from the conda-forge and bioconda channels. The same versions are installed on Intel (linux-64) and Apple silicon or ARM (linux-aarch64) machines. This set was tested in November 2026: the consensus workflow completed and recovered all variants in a simulated test dataset. The `nextstrain/base` image is not pinned and is downloaded at its latest version.
+All versions are pinned in `env.yml`, and packages come only from the conda-forge and bioconda channels. The same versions are installed on Intel (linux-64) and Apple silicon or ARM (linux-aarch64) machines. The `nextstrain/base` image is not pinned and is downloaded at its latest version.
 
 ## Consensus workflow
 
@@ -349,7 +333,7 @@ province, country, city, town, db, title, journal, paper_url
 
 Then MAFFT aligns `data/sequence.fasta` in the `hantacon_core` container, and `snakemake -c 4` runs the Augur build in the `hantacon_nextstrain` container. The Snakefile runs `augur index`, `filter`, `tree`, `refine` (time tree, marginal date inference, `opt` coalescent), `traits` (on `province`, with confidence), `ancestral` (joint), `translate`, `export v2`, and `frequencies` (KDE).
 
-The resulting `auspice/htv_<segment>.json` and its two sidecar files, `htv_<segment>_tip-frequencies.json` and `htv_<segment>_root-sequence.json`, are copied to the run result directory and to `workspace/auspice/`, where the Auspice server picks them up. Without the tip-frequencies file Auspice shows `Failed to fetch tip frequencies`.
+The resulting `auspice/htv_<segment>.json` and its two sidecar files, `htv_<segment>_tip-frequencies.json` and `htv_<segment>_root-sequence.json`, are copied to the run result directory and to `workspace/auspice/`, where the Auspice server picks them up.
 
 ## Supported location names
 
@@ -428,9 +412,6 @@ sudo chmod 4755 node_modules/electron/dist/chrome-sandbox
 
 Repeat after `npm install` replaces the Electron runtime.
 
-**An analysis fails with `[Docker Error] exit 127`.**
-The `docker` command was not found. Install Docker Desktop and open it once. On macOS, HantaCon looks for `docker` in `~/.docker/bin`, `/Applications/Docker.app/Contents/Resources/bin`, `/usr/local/bin`, and `/opt/homebrew/bin`, because applications opened from Finder do not see the Terminal `PATH`. Packages built before this search was added show this error when opened from Applications; rebuild and reinstall as in [Updating](#updating).
-
 **An analysis fails immediately with a Docker error.**
 Check that Docker is running (macOS: Docker Desktop shows **Engine running**) and that `docker compose version` works in Terminal. Then press **Restart Services** in the Settings tab.
 
@@ -448,9 +429,6 @@ Its location names must match `config/lat_longs.tsv`. See [Supported location na
 
 **The offline viewer shows nothing, or a new run is missing.**
 Press **Refresh**. Confirm that `hantacon_nextstrain_env` is running (`docker ps`) and that no other program uses port 4000. At least one completed Phylodynamics run is needed.
-
-**Result files cannot be edited or deleted (Linux, older installations).**
-Older versions wrote `UID=1000` and `GID=1000` to `~/Desktop/HantaCon/.env`. Set them to the output of `id -u` and `id -g`, then run `cd ~/Desktop/HantaCon && docker compose up -d --force-recreate`.
 
 ## Tool references
 
