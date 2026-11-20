@@ -1,9 +1,13 @@
 # HantaCon documentation
 
-Reference documentation for [HantaCon](README.md). See the README for installation and a quick start.
+Manual for [HantaCon](README.md). Installation and a quick start are in the README.
 
 ## Contents
 
+- [Usage](#usage)
+- [Updating](#updating)
+- [Uninstalling](#uninstalling)
+- [Building from source](#building-from-source)
 - [Architecture](#architecture)
 - [Directory layout](#directory-layout)
 - [Bioinformatics tools](#bioinformatics-tools)
@@ -11,11 +15,241 @@ Reference documentation for [HantaCon](README.md). See the README for installati
 - [Phylodynamics workflow](#phylodynamics-workflow)
 - [Supported location names](#supported-location-names)
 - [Reference database](#reference-database)
-- [Running from source](#running-from-source)
-- [Building distributable packages](#building-distributable-packages)
 - [Rebuilding the backend](#rebuilding-the-backend)
 - [Troubleshooting](#troubleshooting)
 - [Tool references](#tool-references)
+
+## Usage
+
+HantaCon supports two analysis modes:
+
+1. **FASTQ workflow**: Nanopore reads → consensus genome generation → phylogeographic analysis → Nextstrain visualization
+2. **FASTA workflow**: prepared HTNV genome sequences → phylogeographic analysis → Nextstrain visualization
+
+The interface is organized into five tabs: **Home**, **Sequence**, **Phylodynamics**, **Visualization**, and **Settings**.
+
+### 1. Home
+
+<img src="src/img/screenshots/1.png" alt="Home tab" width="640">
+
+The Home tab shows an overview of HantaCon and lab/administrator information.
+
+### 2. Sequence: consensus generation
+
+<img src="src/img/screenshots/2.png" alt="Consensus sequence tab" width="640">
+
+Enter a sample prefix, select a FASTQ file, and choose the reference genome (HTNV_76-118 or HTNV_Ac20-5).
+
+The input is one uncompressed FASTQ file per sample (`.fastq` or `.fq`; `.gz` files cannot be selected). Nanopore runs usually write many `.fastq.gz` files per barcode; combine them into one file first, for example:
+
+```bash
+cat barcode01/*.fastq.gz | gunzip > sample01.fastq
+``` The consensus thresholds can be adjusted:
+
+| Parameter | Default |
+|---|---|
+| Variant quality threshold | 10 |
+| Variant depth threshold | 50 |
+| Low coverage threshold | 5 |
+
+Press **Generate** to run the workflow. Reads are aligned to the tripartite reference, segment-specific alignments are separated, variants are called and filtered, and low-coverage regions are masked. The output is one consensus FASTA file per segment, with the thresholds used for the run recorded in the FASTA header. Press **Open result** to view the output directory.
+
+Variant calling uses the Medaka model `r941_prom_sup_variant_g507` (R9.4.1 flow cells, super-accuracy basecalling).
+
+### 3. Phylodynamics: metadata and phylogenetic analysis
+
+<img src="src/img/screenshots/3.png" alt="Phylodynamic analysis tab" width="640">
+
+Select a consensus FASTA file (`.fasta` or `.fa`) and the corresponding genomic segment (L, M, or S), then enter the sample information used for phylogeographic placement: host species, location (country, province, city, and town; leave a level empty when it is not available), and collection date.
+
+Only the first sequence in the selected FASTA file is analyzed, and its name (the FASTA header up to the first space) must not already exist in the reference database. Press **Generate metadata** to build the dataset and run the segment-specific analysis against the bundled reference database. Each segment is analyzed separately.
+
+### 4. Visualization: interactive exploration
+
+<img src="src/img/screenshots/4.png" alt="Visualization analysis tab" width="640">
+
+**Offline** mode shows the results stored on this computer (served at `http://localhost:4000`); click a dataset name to open it. **Online** mode opens auspice.us, where result files from `~/Desktop/HantaCon/workspace/result/<date_time>/` can be dragged onto the page; drag the three `htv_<segment>*.json` files together.
+
+Tips can be coloured by metadata field, filtered by query, and restricted to a date range. The Geography panel maps sequences by their annotated locality, the entropy panel shows nucleotide diversity across the genome, and the frequency panel shows tip frequencies over time.
+
+### 5. Settings: backend management
+
+**Restart Services** starts the backend containers again. **Reinstall Services** downloads the latest `nextstrain/base` image and recreates both containers. Use these if an analysis stops with a Docker error. To rebuild the `hantacon_core` image, see [Rebuilding the backend](#rebuilding-the-backend).
+
+## Updating
+
+For an installation built from source (see [Building from source](#building-from-source)):
+
+**macOS**
+
+```bash
+cd ~/KU-HantaCon
+git pull
+npm install
+rm -rf dist
+npm run build:mac
+cd ~/Desktop/HantaCon && docker compose down --rmi local && rm dockerfile env.yml docker-compose.yml
+```
+
+Then install the new `.dmg` from `dist` as in [Building from source](#building-from-source) and choose **Replace**.
+
+**Ubuntu Linux**
+
+```bash
+cd ~/KU-HantaCon
+git pull
+npm install
+rm -rf dist
+npm run build:linux
+sudo apt install ./dist/hantacon_*.deb
+cd ~/Desktop/HantaCon && docker compose down --rmi local && rm dockerfile env.yml docker-compose.yml
+```
+
+`sudo apt install` replaces the installed version.
+
+With a downloaded package, install the newer package from [Releases](https://github.com/KU-MV/KU-HantaCon/releases/latest) as in the [README](README.md#installation) (macOS: choose **Replace**; Ubuntu: `sudo apt install` replaces the installed version), then run the last line of the block above.
+
+The last line removes the old analysis environment. HantaCon copies the new Docker files at the next start and rebuilds the environment at the next analysis.
+
+## Uninstalling
+
+Back up anything you need from `~/Desktop/HantaCon/workspace/result` first, then:
+
+**macOS**
+
+```bash
+cd ~/Desktop/HantaCon && docker compose down --rmi all --remove-orphans
+rm -rf ~/Desktop/HantaCon
+```
+
+Then drag HantaCon from Applications to the Trash.
+
+**Ubuntu Linux**
+
+```bash
+sudo apt remove hantacon
+cd ~/Desktop/HantaCon && docker compose down --rmi all --remove-orphans
+rm -rf ~/Desktop/HantaCon
+```
+
+`--rmi all` also removes the `nextstrain/base` image. Docker, Node.js, and Git stay installed. If you built from source, also remove the source folder with `rm -rf ~/KU-HantaCon`.
+
+## Building from source
+
+Building is needed only to change the code or to make your own packages. Prebuilt packages are on [Releases](https://github.com/KU-MV/KU-HantaCon/releases/latest).
+
+### Prerequisites
+
+Docker as in the [README](README.md#installation), plus Node.js 22.12 or later and Git.
+
+**macOS**
+
+1. Install Node.js: download the **LTS macOS Installer (.pkg)** from [nodejs.org/en/download](https://nodejs.org/en/download) and run it.
+2. Check:
+
+   ```bash
+   docker compose version
+   node -v
+   git --version
+   ```
+
+   `node -v` must print `v22.12` or higher. If macOS offers to install the command line developer tools at `git --version`, press **Install**; this installs Git.
+
+**Ubuntu Linux**
+
+1. Install Git and Node.js:
+
+   ```bash
+   sudo apt install -y git curl
+   curl -fsSL https://deb.nodesource.com/setup_lts.x -o nodesource_setup.sh
+   sudo -E bash nodesource_setup.sh
+   sudo apt install -y nodejs
+   ```
+
+   Do not install Node.js with `sudo apt install nodejs` alone: the version in Ubuntu's own repository is too old.
+
+2. Check:
+
+   ```bash
+   docker run hello-world
+   node -v
+   git --version
+   ```
+
+   `node -v` must print `v22.12` or higher.
+
+### Build and install
+
+1. Download the source code and its dependencies:
+
+   ```bash
+   cd ~
+   git clone https://github.com/KU-MV/KU-HantaCon.git
+   cd KU-HantaCon
+   npm install
+   ```
+
+   `npm install` may end with a message such as `11 vulnerabilities` and suggest `npm audit fix --force`. Ignore it; do not run `npm audit fix`.
+
+2. Build the package:
+
+   ```bash
+   npm run build:mac        # macOS, about 1 minute
+   npm run build:linux      # Ubuntu Linux, about 1.5 minutes
+   ```
+
+   The package is written to the `dist` folder. Building only creates the package; it does not install it.
+
+   | | macOS | Ubuntu Linux |
+   |---|---|---|
+   | Files in `dist` | `HantaCon-<version>-arm64.dmg` (Apple silicon), `HantaCon-<version>.dmg` (Intel) | `hantacon_<version>_amd64.deb` (x86-64), or `_arm64.deb` when built on an ARM computer |
+
+3. Install the package:
+
+   - macOS: run `open dist`, double-click the `.dmg` for your chip, and drag HantaCon to Applications.
+   - Ubuntu Linux:
+
+     ```bash
+     sudo apt install ./dist/hantacon_*.deb
+     ```
+
+     Enter your password when asked.
+
+4. Start Docker, then open HantaCon:
+
+   - macOS: open HantaCon from Applications.
+   - Ubuntu Linux: open HantaCon from the applications menu, or run `hantacon` in a terminal.
+
+### npm commands
+
+Run inside the `KU-HantaCon` folder.
+
+| Command | What it does |
+|---|---|
+| `npm install` | Downloads the dependencies pinned in `package-lock.json` into `node_modules`. Run after cloning and after each `git pull`. |
+| `npm start` | Runs HantaCon from the source folder without building or installing it. |
+| `npm run build:mac` | Builds `.dmg` and `.zip` packages for Apple silicon (arm64) and Intel (x64) into `dist/`. Must be run on a Mac. |
+| `npm run build:linux` | Builds a `.deb` package into `dist/`. |
+| `npm run build` | Runs both builds. |
+
+### Running without installing (`npm start`)
+
+The installed application is opened like any other program and runs on its own. Alternatively, HantaCon can be run directly from the source folder in the terminal, the way command-line tools are run. Nothing is built or installed, and HantaCon quits when that terminal session ends. This is useful for testing changes to the source code.
+
+```bash
+cd ~/KU-HantaCon
+npm start
+```
+
+On Ubuntu 24.04 or later, if `npm start` stops with `The SUID sandbox helper binary was found, but is not configured correctly`, run the two commands under that error in [Troubleshooting](#troubleshooting) once, then `npm start` again.
+
+### Packaging notes
+
+Electron is pinned to 45.3.4, which requires Node.js 22.12 or later (`engines` in `package.json`). `package-lock.json` is committed, so `npm install` installs the same dependency versions on every machine.
+
+Packaged builds take their icon from `package.json` (see below). When run with `npm start`, `main.js` sets the same icon on the window and, on macOS, the Dock.
+
+Icons come from `build.mac.icon` (`resources/icons/mac/icon.icns`) and `build.linux.icon` (`resources/256x256.png`) in `package.json`. macOS builds are ad-hoc signed (`identity: "-"`, `hardenedRuntime: false`), not signed with a Developer ID or notarized, so the first launch of a downloaded package must be allowed under System Settings, Privacy & Security (**Open Anyway**). Without ad-hoc signing of the whole bundle, macOS rejects a downloaded package as damaged. Build the macOS package on a Mac; electron-builder does not support building it on Linux.
 
 ## Architecture
 
@@ -149,24 +383,6 @@ Sequences and metadata were retrieved from GenBank on 30 August 2025. `config/co
 
 <!-- TODO: add the inclusion and exclusion criteria used when assembling the dataset. -->
 
-## Running from source
-
-Installation steps for macOS and Ubuntu are in the [README](README.md#installation).
-
-Electron is pinned to 45.3.4, which requires Node.js 22.12 or later (`engines` in `package.json`). `package-lock.json` is committed, so `npm install` installs the same dependency versions on every machine.
-
-Packaged builds take their icon from `package.json` (see below). When run with `npm start`, `main.js` sets the same icon on the window and, on macOS, the Dock.
-
-## Building distributable packages
-
-```bash
-npm run build:linux   # .deb, written to dist/
-npm run build:mac     # .dmg and .zip for x64 and arm64
-npm run build         # both
-```
-
-Icons come from `build.mac.icon` (`resources/icons/mac/icon.icns`) and `build.linux.icon` (`resources/256x256.png`) in `package.json`. macOS builds are ad-hoc signed (`identity: "-"`, `hardenedRuntime: false`), not signed with a Developer ID or notarized, so the first launch of a downloaded package must be allowed under System Settings, Privacy & Security (**Open Anyway**). Without ad-hoc signing of the whole bundle, macOS rejects a downloaded package as damaged. Build the macOS package on a Mac; electron-builder does not support building it on Linux.
-
 ## Rebuilding the backend
 
 **Restart Services** in the Settings tab runs:
@@ -195,7 +411,7 @@ Note that HantaCon copies the Docker files into `~/Desktop/HantaCon` only when t
 ## Troubleshooting
 
 **`node -v` prints a version lower than 22.12, or `npm install` reports an unsupported engine.**
-Install the current LTS release of Node.js as described in the [README](README.md#prerequisites). On Ubuntu, `sudo apt install nodejs` without the NodeSource step installs a version that is too old.
+Install the current LTS release of Node.js as described in [Building from source](#prerequisites). On Ubuntu, `sudo apt install nodejs` without the NodeSource step installs a version that is too old.
 
 **`permission denied while trying to connect to the Docker daemon socket` (Linux).**
 Your account is not yet in the `docker` group. Run `sudo usermod -aG docker $USER`, log out, log back in, and try again.
@@ -211,7 +427,7 @@ sudo chmod 4755 node_modules/electron/dist/chrome-sandbox
 Repeat after `npm install` replaces the Electron runtime.
 
 **An analysis fails with `[Docker Error] exit 127`.**
-The `docker` command was not found. Install Docker Desktop and open it once. On macOS, HantaCon looks for `docker` in `~/.docker/bin`, `/Applications/Docker.app/Contents/Resources/bin`, `/usr/local/bin`, and `/opt/homebrew/bin`, because applications opened from Finder do not see the Terminal `PATH`. Packages built before this search was added show this error when opened from Applications; rebuild and reinstall as in the [README](README.md#updating).
+The `docker` command was not found. Install Docker Desktop and open it once. On macOS, HantaCon looks for `docker` in `~/.docker/bin`, `/Applications/Docker.app/Contents/Resources/bin`, `/usr/local/bin`, and `/opt/homebrew/bin`, because applications opened from Finder do not see the Terminal `PATH`. Packages built before this search was added show this error when opened from Applications; rebuild and reinstall as in [Updating](#updating).
 
 **An analysis fails immediately with a Docker error.**
 Check that Docker is running (macOS: Docker Desktop shows **Engine running**) and that `docker compose version` works in Terminal. Then press **Restart Services** in the Settings tab.
