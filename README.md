@@ -63,7 +63,7 @@ Runtime reference (benchmark hardware, not a minimum requirement): for the datas
 
    ```bash
    cd ~/Downloads
-   sudo apt install ./hantacon_<version>_amd64.deb
+   sudo apt install ./hantacon_*_amd64.deb
    ```
 
    On Ubuntu installed in another language, the Downloads folder may have a translated name (for example `~/다운로드`); use that folder instead. `apt` also installs the system libraries HantaCon needs, and on Ubuntu 24.04 and later the package installs the AppArmor profile that the application's sandbox requires there.
@@ -78,7 +78,7 @@ To build HantaCon from source instead, see [Building from source](DOCS.md#buildi
 
 Make sure Docker is running before opening HantaCon (macOS: Docker Desktop shows **Engine running**; Ubuntu: `docker info` prints no error).
 
-On launch, HantaCon creates its working directory at `~/Desktop/HantaCon` and writes its Docker Compose configuration there. Analysis inputs, intermediate files, and results are all kept under that directory.
+On launch, HantaCon creates its working directory at `~/Desktop/HantaCon` (on Ubuntu installed in another language, this is a separate `Desktop` folder in your home folder, not the translated desktop folder; **Open result** opens it) and writes its Docker Compose configuration there. Analysis inputs, intermediate files, and results are all kept under that directory.
 
 The backend containers are built the first time an analysis is started, not at launch. The first Sequence run builds the `hantacon_core` image, and the first Phylodynamics run downloads the `nextstrain/base` image. Together these download several GB. During the download the application log may show no new lines for several minutes; this is normal. Later runs start immediately.
 
